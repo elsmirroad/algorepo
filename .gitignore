@@ -1,0 +1,50 @@
+# private info
+.drafts/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.venv/
+dist/
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pycache__/
+*.pyc
+
+# Cache
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# DB Data
+.redis_data/
+.postgres_data/
+.pgadmin_data/
+
+# Logs
+logs/
+*.log
+
+# Alembic
+alembic/versions/*.pyc
+alembic/__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+docker-data/
