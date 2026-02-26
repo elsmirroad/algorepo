@@ -1,0 +1,45 @@
+from dataclasses import dataclass
+
+from algorepo.exceptions import UnsupportedLanguageError
+
+
+@dataclass
+class Language:
+    name: str
+    extension: str
+    comment_symbol: str
+    platform_ids: dict[str, str] # {"leetcode": "Python3"..}
+    tester: str | None = None
+    footer: str | None = None
+
+def select_language(
+    available: list[str],
+    platform: str,
+    priority: list[str],
+    preferred: str | None = None,
+) -> Language:
+    """Return first language from priority for Platform"""
+
+    if preferred:
+        if preferred in available:
+            return LANGUAGES[preferred]
+        else:
+            raise UnsupportedLanguageError()
+
+    for lang in priority:
+        if lang in available:
+            return LANGUAGES[lang]
+    raise UnsupportedLanguageError()
+
+
+LANGUAGES: dict[str, Language] = {
+      "Python3": Language(
+        name="Python3",
+        extension=".py",
+        comment_symbol="#",
+        tester="from lc import *",
+        platform_ids={"leetcode": "Python3"},
+        footer='test("""\n{description}\n""")',
+    ),
+  }
+
