@@ -1,0 +1,8 @@
+general:
+    solutions_dir: ~/Solutions
+    language_priority:
+      - Python3
+    editor: code
+    open_editor: true
+    leetcode_session: "session_token"
+    leetcode_csrf_token: "csrf_token"

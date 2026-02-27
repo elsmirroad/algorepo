@@ -1,8 +1,10 @@
 from urllib.parse import urlparse
 
 import httpx
+from bs4 import BeautifulSoup
 from pydantic import HttpUrl
 
+from algorepo.config import Config
 from algorepo.exceptions import NetworkError, ProblemNotFoundError
 from algorepo.models import Problem
 from algorepo.platforms.base import Platform
@@ -23,12 +25,11 @@ QUERY = """
   }
   """
 
-
 class LeetCodePlatform(Platform):
     GRAPHQL_URL = "https://leetcode.com/graphql"
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, config: Config) -> None:
+        super().__init__(config=config)
 
     def fetch(self, url: str) -> dict:
         slug = self._extract_slug(url)
@@ -38,6 +39,17 @@ class LeetCodePlatform(Platform):
                 json={
                     "query": QUERY,
                     "variables": {"titleSlug":slug}
+                },
+                headers={
+                    "Content-Type": "application/json",
+                    "Referer": "https://leetcode.com",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", # noqa
+                    "Origin": "https://leetcode.com",
+                    "x-csrftoken": self.config.leetcode_csrf_token,
+                },
+                cookies={
+                    "csrftoken": self.config.leetcode_csrf_token,
+                    "LEETCODE_SESSION": self.config.leetcode_session,
                 }
             )
             response.raise_for_status()
@@ -49,12 +61,13 @@ class LeetCodePlatform(Platform):
         question = raw.get("data", {}).get("question")
         if not question:
             raise ProblemNotFoundError(f"Problem was not found: {url}")
+        description = self._extract_description(question["content"])
         return Problem(
             id=question["questionId"],
             title=question["title"],
             platform="leetcode",
             difficulty=question["difficulty"],
-            description=question["content"],
+            description=description,
             url=HttpUrl(url),
             code_snippets={s["langSlug"]: s["code"] for s in question["codeSnippets"]},
             sample_test_case=question.get("sampleTestCase"),
@@ -65,3 +78,11 @@ class LeetCodePlatform(Platform):
         """Extract slug from link"""
         extracted = urlparse(url)
         return extracted.path.split('/')[2]
+
+    @staticmethod
+    def _extract_description(response_text: str) -> str:
+        """Delete HTML-tags and get beauty Description"""
+        description = BeautifulSoup(response_text, "lxml")
+        for tag in description.find_all("sup"):
+            tag.replace_with(f"^{tag.get_text()}")
+        return description.get_text()

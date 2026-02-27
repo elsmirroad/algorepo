@@ -12,7 +12,7 @@ def render_solution_file(problem: Problem, language: Language, code: str) -> str
         f"{comment} {full_title}", # Number + Problem Title
         f"{comment} {problem.url}", # Problem url
         f"{comment} {separator}\n\n",
-        f"{code}",
+        f"{code}\n\n",
     ]
     if language.tester:
         lines.insert(0, language.tester)

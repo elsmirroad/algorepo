@@ -1,3 +1,4 @@
+import os
 import subprocess
 from pathlib import Path
 
@@ -6,13 +7,14 @@ from algorepo.languages import select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
 from algorepo.renderer import render_solution_file
-from algorepo.utils.validator import get_platform, validate_url
+from algorepo.utils.validator import NAMES, get_platform, validate_url
 
 
 class Algorepo:
 
     def __init__(self):
-        self.config = Config()
+        config_path = Path("config.yaml")
+        self.config = Config.from_yaml(config_path)
 
     def download_problem(
         self,
@@ -22,7 +24,7 @@ class Algorepo:
     ) -> Path:
         platform_name = validate_url(url)
 
-        platform = get_platform(platform_name)
+        platform = get_platform(platform_name, config=self.config)
         raw = platform.fetch(url)
         problem = platform.parse(raw, url)
 
@@ -41,7 +43,7 @@ class Algorepo:
         filepath = self._save(problem, lang, content)
 
         if open_editor and self.config.open_editor:
-            subprocess.Popen([self.config.editor, str(filepath)])
+            subprocess.run([self.config.editor, str(filepath)])
 
         return filepath
 
@@ -49,8 +51,10 @@ class Algorepo:
     def _save(self, problem: Problem, lang: Language, content: str):
         filename = f"{problem.id}. {problem.title}"
         extension = lang.extension
-        path = self.config.solutions_dir / f"{filename}{extension}"
+        platform = NAMES.get(problem.platform, problem.platform)
+        path = self.config.solutions_dir / platform / f"{filename}{extension}"
         path.parent.mkdir(parents=True, exist_ok=True)
+        os.chdir(path.parent)
 
         with open(path, "w", encoding="UTF-8") as file:
             file.write(content)

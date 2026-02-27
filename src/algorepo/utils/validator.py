@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 
+from algorepo.config import Config
 from algorepo.exceptions import UnsupportedPlatformError
 from algorepo.platforms.base import Platform
 from algorepo.platforms.leetcode import LeetCodePlatform
@@ -10,7 +11,11 @@ DOMAINS = {
   }
 
 PLATFORMS = {
-    "leetcode": LeetCodePlatform(),
+    "leetcode": LeetCodePlatform,
+}
+
+NAMES = {
+    "leetcode": "LeetCode",
 }
 
 
@@ -21,6 +26,5 @@ def validate_url(url: str) -> str:
     raise UnsupportedPlatformError()
 
 
-#WAITING: Get Config argument for Platform Class
-def get_platform(name: str) -> Platform:
-    return PLATFORMS[name]
+def get_platform(name: str, config: Config) -> Platform:
+    return PLATFORMS[name](config=config)

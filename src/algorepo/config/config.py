@@ -9,6 +9,8 @@ class Config(BaseModel):
     language_priority: list[str] = ["Python3"]
     editor: str = "code"
     open_editor: bool = True
+    leetcode_session: str = ""
+    leetcode_csrf_token: str = ""
 
     @field_validator("solutions_dir", mode="before")
     @classmethod

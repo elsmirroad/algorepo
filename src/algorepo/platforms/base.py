@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
+from algorepo.config import Config
 from algorepo.models import Problem
 
 
-#WAITING: Add Config argument for platform initialization
 class Platform(ABC):
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, config: Config) -> None:
+        self.config = config
 
     @abstractmethod
     def fetch(self, url: str) -> dict:

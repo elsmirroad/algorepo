@@ -21,14 +21,20 @@ def select_language(
     """Return first language from priority for Platform"""
 
     if preferred:
-        if preferred in available:
-            return LANGUAGES[preferred]
+        if preferred in LANGUAGES:
+            lang = LANGUAGES[preferred]
+            if lang.platform_ids.get(platform) in available:
+                return lang
+            else:
+                raise UnsupportedLanguageError()
         else:
             raise UnsupportedLanguageError()
 
     for lang in priority:
-        if lang in available:
-            return LANGUAGES[lang]
+        if lang in LANGUAGES:
+            lang = LANGUAGES[lang]
+            if lang.platform_ids.get(platform) in available:
+                return lang
     raise UnsupportedLanguageError()
 
 
@@ -38,7 +44,7 @@ LANGUAGES: dict[str, Language] = {
         extension=".py",
         comment_symbol="#",
         tester="from lc import *",
-        platform_ids={"leetcode": "Python3"},
+        platform_ids={"leetcode": "python3"},
         footer='test("""\n{description}\n""")',
     ),
   }

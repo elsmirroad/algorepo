@@ -1,6 +1,9 @@
 import typer
 from rich.console import Console
 
+from algorepo.exceptions import AlgorepoError
+from algorepo.main import Algorepo
+
 app = typer.Typer(help="CLI utility for parsing algorithmic problems")
 console = Console()
 
@@ -11,7 +14,14 @@ def download(
     no_editor: bool = typer.Option(False, "--no-editor", help="Do not open editor"),
 ):
     """Download the problem and create a solution file."""
-    ...
+    try:
+        client = Algorepo()
+        filepath = client.download_problem(url=url, language=language, open_editor=not no_editor)
+        console.print("[green]✓[/green] ...")
+        console.print(f"{filepath}")
+    except AlgorepoError as e:
+        console.print(f"[red]✗ Error:[/red] {e}")
+        raise typer.Exit(1)
 
 @app.command()
 def config():
