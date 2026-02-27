@@ -12,7 +12,7 @@ from algorepo.platforms.base import Platform
 QUERY = """
   query questionData($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
-          questionId
+          questionFrontendId
           title
           difficulty
           content
@@ -65,7 +65,7 @@ class LeetCodePlatform(Platform):
         description = self._extract_description(question["content"])
         url=f"https://leetcode.com/problems/{self._extract_slug(url)}/"
         return Problem(
-            id=question["questionId"],
+            id=question["questionFrontendId"],
             title=question["title"],
             platform="leetcode",
             difficulty=question["difficulty"],
