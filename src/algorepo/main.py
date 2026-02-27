@@ -24,7 +24,7 @@ class Algorepo:
     ) -> Path:
         platform_name = validate_url(url)
 
-        platform = get_platform(platform_name, config=self.config)
+        platform = get_platform(name=platform_name, config=self.config)
         raw = platform.fetch(url)
         problem = platform.parse(raw, url)
 
@@ -36,11 +36,11 @@ class Algorepo:
         )
 
         content = render_solution_file(
-            problem,
-            lang,
-            problem.code_snippets[
+            problem=problem,
+            language=lang,
+            code=problem.code_snippets[
                 lang.platform_ids[platform_name]])
-        filepath = self._save(problem, lang, content)
+        filepath = self._save(problem=problem, lang=lang, content=content)
 
         if open_editor and self.config.open_editor:
             subprocess.run([self.config.editor, str(filepath)])

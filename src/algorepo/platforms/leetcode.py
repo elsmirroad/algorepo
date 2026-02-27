@@ -50,7 +50,8 @@ class LeetCodePlatform(Platform):
                 cookies={
                     "csrftoken": self.config.leetcode_csrf_token,
                     "LEETCODE_SESSION": self.config.leetcode_session,
-                }
+                },
+                timeout=30,
             )
             response.raise_for_status()
         except httpx.HTTPError as e:
@@ -62,6 +63,7 @@ class LeetCodePlatform(Platform):
         if not question:
             raise ProblemNotFoundError(f"Problem was not found: {url}")
         description = self._extract_description(question["content"])
+        url=f"https://leetcode.com/problems/{self._extract_slug(url)}/"
         return Problem(
             id=question["questionId"],
             title=question["title"],
