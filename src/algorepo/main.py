@@ -48,16 +48,16 @@ class Algorepo:
         )
         filepath = self._save(problem=problem, lang=lang, content=content)
 
-        if open_editor and self.config.open_editor:
-            subprocess.run([self.config.editor, str(filepath)])
-
         result = DownloadResult(
             filepath=filepath,
             problem=problem,
-            language=lang
+            language=lang,
         )
 
         return result
+
+    def open_in_editor(self, filepath:Path):
+        subprocess.run([self.config.editor, str(filepath)])
 
     def _save(self, problem: Problem, lang: Language, content: str):
         filename = f"{problem.id}. {problem.title}"

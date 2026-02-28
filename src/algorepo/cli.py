@@ -17,16 +17,21 @@ def download(
 ):
     """Download the problem and create a solution file."""
     try:
-        client = Algorepo()
-        result = client.download_problem(url=url, language=language, open_editor=not no_editor)
+        with console.status("[bold green]Downloading problem...[/bold green]", spinner="dots"):
+            client = Algorepo()
+            result = client.download_problem(url=url, language=language, open_editor=not no_editor)
         output = format_result(
             id=result.problem.id,
             problem=result.problem.title,
             difficulty=result.problem.difficulty,
             language=result.language.name,
-            filepath=str(result.filepath)
+            filepath=str(result.filepath),
         )
         console.print(output)
+
+        if not no_editor:
+            client.open_in_editor(result.filepath)
+
     except AlgorepoError as e:
         console.print(f"[red]✗ Error:[/red] {e}")
         raise typer.Exit(1)
