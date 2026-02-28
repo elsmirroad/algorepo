@@ -21,7 +21,7 @@ def download(
             client = Algorepo()
             result = client.download_problem(url=url, language=language, open_editor=not no_editor)
         output = format_result(
-            id=result.problem.id,
+            problem_id=result.problem.problem_id,
             problem=result.problem.title,
             difficulty=result.problem.difficulty,
             language=result.language.name,

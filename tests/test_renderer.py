@@ -8,7 +8,7 @@ from algorepo.renderer import render_solution_file
 @pytest.fixture
 def valid_problem_data():
     return {
-        "id": "1",
+        "problem_id": "1",
         "title": "Two Sum",
         "platform": "leetcode",
         "difficulty": "Easy",

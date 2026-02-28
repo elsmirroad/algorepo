@@ -7,7 +7,7 @@ from algorepo.models import Problem
 @pytest.fixture
 def valid_problem_data():
     return {
-        "id": "1",
+        "problem_id": "1",
         "title": "Two Sum",
         "platform": "leetcode",
         "difficulty": "Easy",
@@ -21,7 +21,7 @@ def valid_problem_data():
 def test_platform_creation(valid_problem_data):
     problem = Problem(**valid_problem_data)
 
-    assert problem.id == "1"
+    assert problem.problem_id == "1"
     assert problem.title == "Two Sum"
     assert problem.platform == "leetcode"
     assert problem.difficulty == "Easy"
@@ -32,7 +32,7 @@ def test_platform_creation(valid_problem_data):
 
 
 @pytest.mark.parametrize("missing_field", [
-    "id",
+    "problem_id",
     "title",
     "platform",
     "difficulty",
@@ -63,7 +63,7 @@ def test_url_auto_cast(valid_problem_data):
 
 def test_code_snippets_default_isolation():
     p1 = Problem(
-        id="1",
+        problem_id="1",
         title="A",
         platform="leetcode",
         difficulty="Easy",
@@ -72,7 +72,7 @@ def test_code_snippets_default_isolation():
     )
 
     p2 = Problem(
-        id="2",
+        problem_id="2",
         title="B",
         platform="leetcode",
         difficulty="Easy",
@@ -89,7 +89,7 @@ def test_model_dump(valid_problem_data):
     problem = Problem(**valid_problem_data)
     dumped = problem.model_dump()
 
-    assert dumped["id"] == "1"
+    assert dumped["problem_id"] == "1"
     assert dumped["platform"] == "leetcode"
     assert isinstance(dumped["url"], HttpUrl)
 
@@ -112,7 +112,7 @@ def test_model_equality(valid_problem_data):
 def test_model_inequality(valid_problem_data):
     p1 = Problem(**valid_problem_data)
     data = valid_problem_data.copy()
-    data["id"] = "2"
+    data["problem_id"] = "2"
     p2 = Problem(**data)
 
     assert p1 != p2

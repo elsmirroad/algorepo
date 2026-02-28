@@ -65,7 +65,7 @@ class LeetCodePlatform(Platform):
         description = self._extract_description(question["content"])
         url=f"https://leetcode.com/problems/{self._extract_slug(url)}/"
         return Problem(
-            id=question["questionFrontendId"],
+            problem_id=question["questionFrontendId"],
             title=question["title"],
             platform="leetcode",
             difficulty=question["difficulty"],

@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl
 
 
 class Problem(BaseModel):
-    id: str
+    problem_id: str
     title: str
     platform: str
     difficulty: str

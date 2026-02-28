@@ -5,7 +5,7 @@ from algorepo.models import Problem
 def render_solution_file(problem: Problem, language: Language, code: str) -> str:
     """Generate file's content"""
     comment = language.comment_symbol
-    full_title = f"{problem.id}. {problem.title}"
+    full_title = f"{problem.problem_id}. {problem.title}"
     separator = "=" * len(max((full_title, str(problem.url)), key=len))
     lines = [
         f"{comment} {separator}",

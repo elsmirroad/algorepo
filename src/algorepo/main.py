@@ -60,7 +60,7 @@ class Algorepo:
         subprocess.run([self.config.editor, str(filepath)])
 
     def _save(self, problem: Problem, lang: Language, content: str):
-        filename = f"{problem.id}. {problem.title}"
+        filename = f"{problem.problem_id}. {problem.title}"
         extension = lang.extension
         platform = NAMES.get(problem.platform, problem.platform)
         path = self.config.solutions_dir / platform / f"{filename}{extension}"

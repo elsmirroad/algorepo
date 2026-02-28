@@ -13,12 +13,12 @@ def get_difficulty_color(difficulty):
         "Hard": colors['r'],
         "": colors['w'],
     }
-    color = dc[difficulty]
+    color = dc.get(difficulty, colors['w'])
     return f"{color[0]}[{difficulty}]{color[1]}"
 
 
 def format_result(
-        id: str,
+        problem_id: str,
         problem: str,
         difficulty: str,
         language: str,
@@ -27,7 +27,7 @@ def format_result(
     difficulty = get_difficulty_color(difficulty)
     c = colors['w']
     return f"""
-{c[0]}{id}. {problem}{c[1]} {difficulty}
+{c[0]}{problem_id}. {problem}{c[1]} {difficulty}
 {c[0]}{language}{c[1]}
 {c[0]}{filepath}{c[1]}
 """
