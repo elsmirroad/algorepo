@@ -19,8 +19,8 @@ class DownloadResult(NamedTuple):
 
 class Algorepo:
     def __init__(self):
-        config_path = Path("config.yaml")
-        self.config = Config.from_yaml(config_path)
+        self.config_path = Path("config.yaml")
+        self.config = Config.from_yaml(self.config_path)
 
     def download_problem(
         self,

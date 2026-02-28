@@ -1,7 +1,7 @@
 import typer
 from rich.console import Console
 
-from algorepo.exceptions import AlgorepoError
+from algorepo.exceptions import AlgorepoError, ConfigError
 from algorepo.main import Algorepo
 from algorepo.utils import format_result
 
@@ -40,7 +40,13 @@ def download(
 @app.command()
 def config():
     """Open the configuration file in an editor."""
-    ...
+    try:
+        with console.status("[bold green]Loading config...[/bold green]", spinner="dots"):
+            client = Algorepo()
+        client.open_in_editor(client.config_path)
+    except ConfigError as e:
+        console.print(f"[red]✗ Error:[/red] {e}")
+        raise typer.Exit(1)
 
 
 @app.command(name="list")
