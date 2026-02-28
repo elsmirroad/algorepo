@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+from typing import NamedTuple
 
 from algorepo.config import Config
 from algorepo.languages import select_language
@@ -10,8 +11,13 @@ from algorepo.renderer import render_solution_file
 from algorepo.utils.validator import NAMES, get_platform, validate_url
 
 
-class Algorepo:
+class DownloadResult(NamedTuple):
+    filepath: Path
+    problem: Problem
+    language: Language
 
+
+class Algorepo:
     def __init__(self):
         config_path = Path("config.yaml")
         self.config = Config.from_yaml(config_path)
@@ -21,7 +27,7 @@ class Algorepo:
         url: str,
         language: str | None = None,
         open_editor: bool = True,
-    ) -> Path:
+    ) -> DownloadResult:
         platform_name = validate_url(url)
 
         platform = get_platform(name=platform_name, config=self.config)
@@ -38,15 +44,20 @@ class Algorepo:
         content = render_solution_file(
             problem=problem,
             language=lang,
-            code=problem.code_snippets[
-                lang.platform_ids[platform_name]])
+            code=problem.code_snippets[lang.platform_ids[platform_name]],
+        )
         filepath = self._save(problem=problem, lang=lang, content=content)
 
         if open_editor and self.config.open_editor:
             subprocess.run([self.config.editor, str(filepath)])
 
-        return filepath
+        result = DownloadResult(
+            filepath=filepath,
+            problem=problem,
+            language=lang
+        )
 
+        return result
 
     def _save(self, problem: Problem, lang: Language, content: str):
         filename = f"{problem.id}. {problem.title}"
@@ -60,4 +71,3 @@ class Algorepo:
             file.write(content)
 
         return path
-

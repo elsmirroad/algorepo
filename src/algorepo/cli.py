@@ -3,9 +3,11 @@ from rich.console import Console
 
 from algorepo.exceptions import AlgorepoError
 from algorepo.main import Algorepo
+from algorepo.utils import format_result
 
 app = typer.Typer(help="CLI utility for parsing algorithmic problems")
 console = Console()
+
 
 @app.command()
 def download(
@@ -16,17 +18,25 @@ def download(
     """Download the problem and create a solution file."""
     try:
         client = Algorepo()
-        filepath = client.download_problem(url=url, language=language, open_editor=not no_editor)
-        console.print("[green]✓[/green] ...")
-        console.print(f"{filepath}")
+        result = client.download_problem(url=url, language=language, open_editor=not no_editor)
+        output = format_result(
+            id=result.problem.id,
+            problem=result.problem.title,
+            difficulty=result.problem.difficulty,
+            language=result.language.name,
+            filepath=str(result.filepath)
+        )
+        console.print(output)
     except AlgorepoError as e:
         console.print(f"[red]✗ Error:[/red] {e}")
         raise typer.Exit(1)
+
 
 @app.command()
 def config():
     """Open the configuration file in an editor."""
     ...
+
 
 @app.command(name="list")
 def list_solutions():
