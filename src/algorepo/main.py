@@ -8,7 +8,8 @@ from algorepo.languages import select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
 from algorepo.renderer import render_solution_file
-from algorepo.utils.validator import NAMES, get_platform, validate_url
+from algorepo.utils import NAMES, get_list, get_platform, validate_url
+from algorepo.utils.agregator import get_platform_list
 
 
 class DownloadResult(NamedTuple):
@@ -56,10 +57,10 @@ class Algorepo:
 
         return result
 
-    def open_in_editor(self, filepath:Path):
+    def open_in_editor(self, filepath: Path) -> None:
         subprocess.run([self.config.editor, str(filepath)])
 
-    def _save(self, problem: Problem, lang: Language, content: str):
+    def _save(self, problem: Problem, lang: Language, content: str) -> Path:
         filename = f"{problem.problem_id}. {problem.title}"
         extension = lang.extension
         platform = NAMES.get(problem.platform, problem.platform)
@@ -71,3 +72,16 @@ class Algorepo:
             file.write(content)
 
         return path
+
+    def get_info(self, platform: str | None = None) -> dict:
+        """Get agregated info for all (or Platform) solutions in Repo"""
+
+        if platform:
+            platform = NAMES[platform]
+            start_dir = self.config.solutions_dir / platform
+            return get_platform_list(start_dir)
+
+        start_dir = self.config.solutions_dir
+        solutions = {k: v for k, v in get_list(start_dir).items() if k in NAMES.values()}
+
+        return solutions

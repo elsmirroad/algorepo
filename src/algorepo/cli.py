@@ -1,9 +1,9 @@
 import typer
 from rich.console import Console
 
-from algorepo.exceptions import AlgorepoError, ConfigError
+from algorepo.exceptions import AlgorepoError, ConfigError, SolutionsListError
 from algorepo.main import Algorepo
-from algorepo.utils import format_result
+from algorepo.utils import format_list, format_result
 
 app = typer.Typer(help="CLI utility for parsing algorithmic problems")
 console = Console()
@@ -50,6 +50,18 @@ def config():
 
 
 @app.command(name="list")
-def list_solutions():
+def list_solutions(
+    platform: str = typer.Option(
+    None, "-p", "--platform",
+    help="-p PlatformName(leetcode // codewars) -> Get list of Solutions"),
+):
     """Show all downloaded solutions."""
-    ...
+    try:
+        with console.status("[bold green]Loading config...[/bold green]", spinner="dots"):
+            client = Algorepo()
+        solutions_list = client.get_info(platform=platform)
+        output = format_list(solutions_list)
+        console.print(output)
+    except SolutionsListError as e:
+        console.print(f"[red]✗ Error:[/red] {e}")
+        raise typer.Exit(1)

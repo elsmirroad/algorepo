@@ -15,3 +15,6 @@ class ConfigError(AlgorepoError):
 
 class UnsupportedPlatformError(AlgorepoError):
     """Platform is not supported"""
+
+class SolutionsListError(AlgorepoError):
+    """Solutions was not found in Solutions directory"""
