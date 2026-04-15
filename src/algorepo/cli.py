@@ -1,18 +1,39 @@
 import typer
+from click import Command, Context, UsageError
 from rich.console import Console
+from typer.core import TyperGroup
 
 from algorepo.exceptions import AlgorepoError, ConfigError, SolutionsListError
 from algorepo.main import Algorepo
 from algorepo.utils import format_list, format_result
 
-app = typer.Typer(help="CLI utility for parsing algorithmic problems")
+
+class DefaultCommandGroup(TyperGroup):
+    def resolve_command(
+        self, ctx: Context, args: list[str]
+    ) -> tuple[str | None, Command | None, list[str]]:
+        try:
+            return super().resolve_command(ctx, args)
+        except UsageError:
+            if args[0].startswith("http"):
+                args.insert(0, "download")
+                return super().resolve_command(ctx, args)
+            else:
+                raise typer.Exit(1)
+
+
+app = typer.Typer(
+    help="CLI utility for parsing algorithmic problems",
+    cls=DefaultCommandGroup,
+    no_args_is_help=True,
+)
 console = Console()
 
 
 @app.command()
 def download(
     url: str = typer.Argument(..., help="URL problem (LeetCode // Codewars)"),
-    language: str = typer.Option(None, "--lang", "-l", help="Solution language"),
+    language: str | None = typer.Option(None, "--lang", "-l", help="Solution language"),
     no_editor: bool = typer.Option(False, "--no-editor", help="Do not open editor"),
 ):
     """Download the problem and create a solution file."""
@@ -51,9 +72,9 @@ def config():
 
 @app.command(name="list")
 def list_solutions(
-    platform: str = typer.Option(
-    None, "-p", "--platform",
-    help="-p PlatformName(leetcode // codewars) -> Get list of Solutions"),
+    platform: str | None = typer.Option(
+        None, "-p", "--platform", help="leetcode // codewars -> Get list of Solutions"
+    ),
 ):
     """Show all downloaded solutions."""
     try:
