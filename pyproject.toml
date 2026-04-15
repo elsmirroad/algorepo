@@ -40,3 +40,9 @@ typeCheckingMode = "basic"
 venvPath = "."
 venv = ".venv"
 include = ["src", "tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-httpx>=0.36.0",
+]
