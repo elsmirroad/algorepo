@@ -18,3 +18,6 @@ class UnsupportedPlatformError(AlgorepoError):
 
 class SolutionsListError(AlgorepoError):
     """Solutions was not found in Solutions directory"""
+
+class AuthorizationError(AlgorepoError):
+    """Authorization Error"""

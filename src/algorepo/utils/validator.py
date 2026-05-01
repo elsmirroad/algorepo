@@ -2,20 +2,21 @@ from urllib.parse import urlparse
 
 from algorepo.config import Config
 from algorepo.exceptions import UnsupportedPlatformError
-from algorepo.platforms.base import Platform
-from algorepo.platforms.leetcode import LeetCodePlatform
+from algorepo.platforms import CodeWarsPlatform, LeetCodePlatform, Platform
 
 DOMAINS = {
       "leetcode.com": "leetcode",
-      "codewars.com": "codewars",
+      "www.codewars.com": "codewars",
   }
 
 PLATFORMS = {
     "leetcode": LeetCodePlatform,
+    "codewars": CodeWarsPlatform,
 }
 
 NAMES = {
     "leetcode": "LeetCode",
+    "codewars": "CodeWars",
 }
 
 

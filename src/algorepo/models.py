@@ -9,4 +9,5 @@ class Problem(BaseModel):
     description: str
     url: HttpUrl
     code_snippets: dict[str, str] = {}
+    available_languages: list[str] = []
     sample_test_case: str | None = None

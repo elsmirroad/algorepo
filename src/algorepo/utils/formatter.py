@@ -7,7 +7,7 @@ colors: dict[str, tuple] = {
 
 
 def get_difficulty_color(difficulty) -> str:
-    """Get right color for fifficulty"""
+    """Get right color for difficulty"""
     dc: dict[str, tuple] = {
         "Easy": colors["g"],
         "Medium": colors["y"],

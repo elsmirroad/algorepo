@@ -4,12 +4,18 @@ from pathlib import Path
 from typing import NamedTuple
 
 from algorepo.config import Config
-from algorepo.languages import select_language
+from algorepo.languages import SNIPPETS, select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
-from algorepo.renderer import render_solution_file
-from algorepo.utils import NAMES, get_list, get_platform, validate_url
-from algorepo.utils.agregator import get_platform_list
+from algorepo.platforms.base import Platform
+from algorepo.utils import (
+    NAMES,
+    get_list,
+    get_platform,
+    get_platform_list,
+    render_solution_file,
+    validate_url,
+)
 
 
 class DownloadResult(NamedTuple):
@@ -29,27 +35,27 @@ class Algorepo:
         language: str | None = None,
         open_editor: bool = True,
     ) -> DownloadResult:
-        platform_name = validate_url(url)
+        platform_name: str = validate_url(url)
 
-        platform = get_platform(name=platform_name, config=self.config)
-        raw = platform.fetch(url)
-        problem = platform.parse(raw, url)
+        platform: Platform = get_platform(name=platform_name, config=self.config)
+        raw: dict[str, str] = platform.fetch(url)
+        problem: Problem = platform.parse(raw, url)
 
-        lang = select_language(
-            available=list(problem.code_snippets.keys()),
+        lang: Language = select_language(
+            available=problem.available_languages,
             platform=platform_name,
             priority=self.config.language_priority,
             preferred=language,
         )
 
-        content = render_solution_file(
+        content: str = render_solution_file(
             problem=problem,
             language=lang,
-            code=problem.code_snippets[lang.platform_ids[platform_name]],
+            code=problem.code_snippets.get(lang.platform_ids[platform_name]) or SNIPPETS[lang.name],
         )
-        filepath = self._save(problem=problem, lang=lang, content=content)
+        filepath: Path = self._save(problem=problem, lang=lang, content=content)
 
-        result = DownloadResult(
+        result: DownloadResult = DownloadResult(
             filepath=filepath,
             problem=problem,
             language=lang,
@@ -61,10 +67,12 @@ class Algorepo:
         subprocess.run([self.config.editor, str(filepath)])
 
     def _save(self, problem: Problem, lang: Language, content: str) -> Path:
-        filename = f"{problem.problem_id}. {problem.title}"
-        extension = lang.extension
-        platform = NAMES.get(problem.platform, problem.platform)
-        path = self.config.solutions_dir / platform / f"{filename}{extension}"
+        filename: str = self.get_filename(
+            platform=problem.platform, problem_id=problem.problem_id, problem_title=problem.title
+        )
+        extension: str = lang.extension
+        platform: str = NAMES.get(problem.platform, problem.platform)
+        path: Path = self.config.solutions_dir / platform / f"{filename}{extension}"
         path.parent.mkdir(parents=True, exist_ok=True)
         os.chdir(path.parent)
 
@@ -74,14 +82,24 @@ class Algorepo:
         return path
 
     def get_info(self, platform: str | None = None) -> dict:
-        """Get agregated info for all (or Platform) solutions in Repo"""
+        """Get aggregated info for all (or Platform) solutions in Repo"""
 
         if platform:
             platform = NAMES[platform]
             start_dir = self.config.solutions_dir / platform
             return get_platform_list(start_dir)
 
-        start_dir = self.config.solutions_dir
-        solutions = {k: v for k, v in get_list(start_dir).items() if k in NAMES.values()}
+        start_dir: Path = self.config.solutions_dir
+        solutions: dict[str, str] = {
+            k: v for k, v in get_list(start_dir).items() if k in NAMES.values()
+        }
 
         return solutions
+
+    def get_filename(self, platform: str, problem_id: str, problem_title: str) -> str:
+        if platform == "leetcode":
+            return f"{problem_id}. {problem_title}"
+        elif platform == "codewars":
+            return f"{problem_title} | {problem_id}"
+        else:
+            return f"{problem_title}"

@@ -8,9 +8,10 @@ class Language:
     name: str
     extension: str
     comment_symbol: str
-    platform_ids: dict[str, str] # {"leetcode": "Python3"..}
-    tester: str | None = None
+    platform_ids: dict[str, str]  # {"leetcode": "Python3"..}
+    tester: dict[str, str]  # {"leetcode": "from lc import *", "codewars": "from cw import *"}
     footer: str | None = None
+
 
 def select_language(
     available: list[str],
@@ -39,13 +40,12 @@ def select_language(
 
 
 LANGUAGES: dict[str, Language] = {
-      "Python3": Language(
+    "Python3": Language(
         name="Python3",
         extension=".py",
         comment_symbol="#",
-        tester="from lc import *",
-        platform_ids={"leetcode": "python3"},
+        tester={"leetcode": "from lc import *", "codewars": "from cw import *"},
+        platform_ids={"leetcode": "python3", "codewars": "python"},
         footer='test("""\n{description}\n""")',
     ),
-  }
-
+}
