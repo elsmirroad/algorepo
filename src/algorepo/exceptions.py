@@ -1,23 +1,63 @@
 class AlgorepoError(Exception):
     """Base project exception"""
 
+
 class NetworkError(AlgorepoError):
     """Network Error (Timeout, DNS, HTTP 4xx/5xx)"""
+
 
 class ProblemNotFoundError(AlgorepoError):
     """Problem was not found on Platform"""
 
+
 class UnsupportedLanguageError(AlgorepoError):
     """Noone language from priority is supported"""
+
+    def __init__(
+        self,
+        reason: str,
+        *,
+        language: str = "",
+        supported: list[str] = [],
+        available: list[str] = [],
+    ):
+        self.reason = reason
+        self.language = language
+        self.supported = supported
+        self.available = available
+
+    def __str__(self):
+        if self.reason == "not_supported":
+            return (
+                f"Language '{self.language}' is not supported by algorepo. "
+                f"Supported languages: {', '.join(self.supported)}"
+            )
+
+        elif self.reason == "not_available":
+            return (
+                f"Language '{self.language}' is not available for this problem. "
+                f"Available languages: {', '.join(self.available)}"
+            )
+
+        elif self.reason == "no_match":
+            return (
+                "None of the languages from your priority list are available for this problem. "
+                f"Available languages: {', '.join(self.available)}"
+            )
+        return "Unsupported language error"
+
 
 class ConfigError(AlgorepoError):
     """Configuration Error"""
 
+
 class UnsupportedPlatformError(AlgorepoError):
     """Platform is not supported"""
 
+
 class SolutionsListError(AlgorepoError):
     """Solutions was not found in Solutions directory"""
+
 
 class AuthorizationError(AlgorepoError):
     """Authorization Error"""
