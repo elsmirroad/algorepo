@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 from algorepo.config import Config
+from algorepo.exceptions import ConfigurationError
 from algorepo.languages import SNIPPETS, select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
@@ -64,7 +65,23 @@ class Algorepo:
         return result
 
     def open_in_editor(self, filepath: Path) -> None:
-        subprocess.run([self.config.editor, str(filepath)])
+        """Open file in configured editor with error handling"""
+        try:
+            result = subprocess.run(
+                [self.config.editor, str(filepath)],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode != 0:
+                raise ConfigurationError(reason="editor", editor=self.config.editor)
+        except FileNotFoundError:
+            raise ConfigurationError(reason="editor", editor=self.config.editor)
+        except PermissionError:
+            raise ConfigurationError(reason="permission")
+        except subprocess.TimeoutExpired:
+            # Editor opened successfully but didn't return (normal for GUI editors)
+            pass
 
     def _save(self, problem: Problem, lang: Language, content: str) -> Path:
         filename: str = self.get_filename(

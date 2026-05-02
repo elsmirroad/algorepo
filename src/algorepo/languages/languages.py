@@ -24,7 +24,7 @@ def select_language(
     if preferred:
         if preferred not in LANGUAGES:
             raise UnsupportedLanguageError(
-                reason="not_supported", language=preferred, available=available
+                reason="not_supported", language=preferred, supported=list(LANGUAGES.keys())
             )
         lang = LANGUAGES[preferred]
         if lang.platform_ids.get(platform) not in available:
@@ -38,7 +38,7 @@ def select_language(
             lang = LANGUAGES[lang]
             if lang.platform_ids.get(platform) in available:
                 return lang
-    raise UnsupportedLanguageError(reason="no_match")
+    raise UnsupportedLanguageError(reason="no_match", available=available)
 
 
 LANGUAGES: dict[str, Language] = {

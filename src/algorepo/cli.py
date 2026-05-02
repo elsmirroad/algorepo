@@ -3,7 +3,7 @@ from click import Command, Context, UsageError
 from rich.console import Console
 from typer.core import TyperGroup
 
-from algorepo.exceptions import AlgorepoError, ConfigError, SolutionsListError
+from algorepo.exceptions import AlgorepoError, ConfigurationError, SolutionsListError
 from algorepo.main import Algorepo
 from algorepo.utils import format_list, format_result
 
@@ -65,7 +65,7 @@ def config():
         with console.status("[bold green]Loading config...[/bold green]", spinner="dots"):
             client = Algorepo()
         client.open_in_editor(client.config_path)
-    except ConfigError as e:
+    except ConfigurationError as e:
         console.print(f"[red]✗ Error:[/red] {e}")
         raise typer.Exit(1)
 
