@@ -4,7 +4,7 @@ from rich.console import Console
 from typer.core import TyperGroup
 
 from algorepo.exceptions import AlgorepoError, ConfigurationError, SolutionsListError
-from algorepo.main import Algorepo
+from algorepo.main import Algorepo, DownloadResult
 from algorepo.utils import format_list, format_result
 
 
@@ -39,9 +39,11 @@ def download(
     """Download the problem and create a solution file."""
     try:
         with console.status("[bold green]Downloading problem...[/bold green]", spinner="dots"):
-            client = Algorepo()
-            result = client.download_problem(url=url, language=language, open_editor=not no_editor)
-        output = format_result(
+            client: Algorepo = Algorepo()
+            result: DownloadResult = client.download_problem(
+                url=url, language=language, open_editor=not no_editor
+            )
+        output: str = format_result(
             problem_id=result.problem.problem_id,
             problem=result.problem.title,
             difficulty=result.problem.difficulty,

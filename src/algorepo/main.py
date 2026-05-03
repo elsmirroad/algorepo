@@ -65,23 +65,13 @@ class Algorepo:
         return result
 
     def open_in_editor(self, filepath: Path) -> None:
-        """Open file in configured editor with error handling"""
+        """Open file in configured editor"""
         try:
-            result = subprocess.run(
-                [self.config.editor, str(filepath)],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            if result.returncode != 0:
-                raise ConfigurationError(reason="editor", editor=self.config.editor)
+            subprocess.run([self.config.editor, str(filepath)])
         except FileNotFoundError:
             raise ConfigurationError(reason="editor", editor=self.config.editor)
         except PermissionError:
             raise ConfigurationError(reason="permission")
-        except subprocess.TimeoutExpired:
-            # Editor opened successfully but didn't return (normal for GUI editors)
-            pass
 
     def _save(self, problem: Problem, lang: Language, content: str) -> Path:
         filename: str = self.get_filename(
