@@ -46,7 +46,7 @@ class Algorepo:
             available=problem.available_languages,
             platform=platform_name,
             priority=self.config.language_priority,
-            preferred=language,
+            preferred=problem.preffered_lang or language,
         )
 
         content: str = render_solution_file(

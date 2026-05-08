@@ -30,6 +30,8 @@ class CodeWarsPlatform(Platform):
     def parse(self, raw: dict, url: str) -> Problem:
         if not raw:
             raise ProblemNotFoundError(f"Problem was not found: {url}")
+
+        language = self._extract_lang(url)
         return Problem(
             problem_id=raw["id"],
             title=raw["name"],
@@ -37,6 +39,7 @@ class CodeWarsPlatform(Platform):
             difficulty=raw["rank"]["name"],
             description=raw["description"],
             url=HttpUrl(url),
+            preffered_lang=language if language else None,
             code_snippets=SNIPPETS, # Custom Snippets
             available_languages=raw["languages"],
         )
@@ -46,3 +49,11 @@ class CodeWarsPlatform(Platform):
         """Extract slug from link"""
         extracted = urlparse(url)
         return extracted.path.split("/")[2]
+
+    @staticmethod
+    def _extract_lang(url: str) -> str | None:
+        """Extract language from link if present"""
+        parts = urlparse(url).path.split('/')
+        if len(parts) > 4 and parts[-3] == 'train':
+            return parts[4]
+        return None
