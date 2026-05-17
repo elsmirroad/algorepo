@@ -40,7 +40,7 @@ class CodeWarsPlatform(Platform):
             description=raw["description"],
             url=HttpUrl(url),
             preffered_lang=language if language else None,
-            code_snippets=SNIPPETS, # Custom Snippets
+            code_snippets=SNIPPETS,  # Custom Snippets
             available_languages=raw["languages"],
         )
 
@@ -53,7 +53,11 @@ class CodeWarsPlatform(Platform):
     @staticmethod
     def _extract_lang(url: str) -> str | None:
         """Extract language from link if present"""
-        parts = urlparse(url).path.split('/')
-        if len(parts) > 4 and parts[-3] == 'train':
-            return parts[4]
+        parts = urlparse(url).path.strip("/").split("/")
+        try:
+            train_index = parts.index("train")
+            if train_index + 1 < len(parts):
+                return parts[train_index + 1]
+        except ValueError:
+            return None
         return None

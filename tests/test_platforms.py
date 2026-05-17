@@ -8,7 +8,10 @@ from algorepo.platforms.leetcode import LeetCodePlatform
 
 @pytest.fixture
 def leetcode_config():
-    return Config()
+    config = Config()
+    config.leetcode_csrf_token = "mock_csrf"
+    config.leetcode_session = "mock_session"
+    return config
 
 def test_leetcode_fetch(httpx_mock, leetcode_config):
     with open("tests/fixtures/leetcode_two_sum.json") as f:

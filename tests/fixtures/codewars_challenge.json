@@ -1,0 +1,12 @@
+{
+  "id": "526989a410342851fe000008",
+  "name": "Even or Odd",
+  "slug": "even-or-odd",
+  "languages": ["pascal", "python", "ruby", "rust"],
+  "rank": {
+    "id": -8,
+    "name": "8 kyu",
+    "color": "white"
+  },
+  "description": "Create a function that takes an integer as an argument and returns \"Even\" for even numbers or \"Odd\" for odd numbers."
+}

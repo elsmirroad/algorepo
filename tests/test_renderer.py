@@ -2,7 +2,7 @@ import pytest
 
 from algorepo.languages import Language
 from algorepo.models import Problem
-from algorepo.renderer import render_solution_file
+from algorepo.utils import render_solution_file
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def valid_language_data():
         "name": "Python3",
         "extension": ".py",
         "comment_symbol": "#",
-        "tester": "from lc import *",
+        "tester": {"leetcode": "from lc import *"},
         "platform_ids": {"leetcode": "python3"},
         "footer": 'test("""\n{description}\n""")',
     }
