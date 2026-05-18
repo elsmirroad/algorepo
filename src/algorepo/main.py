@@ -4,7 +4,11 @@ from pathlib import Path
 from typing import NamedTuple
 
 from algorepo.config import Config, get_config_dir
-from algorepo.exceptions import ConfigErrorReason, ConfigurationError
+from algorepo.exceptions import (
+    ConfigErrorReason,
+    ConfigurationError,
+    SolutionsListError,
+)
 from algorepo.languages import SNIPPETS, select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
@@ -94,16 +98,17 @@ class Algorepo:
         """Get aggregated info for all (or Platform) solutions in Repo"""
 
         if platform:
-            platform = NAMES[platform]
-            start_dir = self.config.solutions_dir / platform
-            return get_platform_list(start_dir)
+            platform_name = NAMES[platform]
+            start_dir = self.config.solutions_dir / platform_name
+        else:
+            start_dir = self.config.solutions_dir
 
-        start_dir: Path = self.config.solutions_dir
-        solutions: dict[str, str] = {
-            k: v for k, v in get_list(start_dir).items() if k in NAMES.values()
-        }
-
-        return solutions
+        try:
+            if platform:
+                return get_platform_list(start_dir)
+            return {k: v for k, v in get_list(start_dir).items() if k in NAMES.values()}
+        except FileNotFoundError:
+            raise SolutionsListError(path=str(start_dir))
 
     def get_filename(self, platform: str, problem_id: str, problem_title: str) -> str:
         if platform == "leetcode":

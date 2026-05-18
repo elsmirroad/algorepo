@@ -2,16 +2,22 @@ from algorepo.exceptions import (
     AuthorizationError,
     LanguageErrorReason,
     NetworkError,
+    NetworkErrorReason,
     ProblemErrorReason,
     ProblemNotFoundError,
+    SolutionsListError,
     UnsupportedLanguageError,
     UnsupportedPlatformError,
 )
 
 
 def test_network_error_message():
-    exc = NetworkError("Timeout")
-    assert "Timeout" in str(exc)
+    exc = NetworkError(
+        platform_name="leetcode", reason=NetworkErrorReason.HTTP_ERROR, details="500 Server Error"
+    )
+    assert "leetcode" in str(exc)
+    assert "500 Server Error" in str(exc)
+    assert "HTTP Error" in str(exc)
 
 
 def test_problem_not_found_message():
@@ -36,11 +42,18 @@ def test_unsupported_language_no_match_message():
 
 
 def test_authorization_error_message():
-    exc = AuthorizationError("LeetCode")
-    assert "LeetCode" in str(exc)
+    exc = AuthorizationError(platform_name="leetcode")
+    assert "leetcode" in str(exc)
+    assert "Authorization failed for" in str(exc)
 
 
 def test_unsupported_platform_message():
-    url = "https://unknown.com"
-    exc = UnsupportedPlatformError(url)
-    assert url in str(exc)
+    exc = UnsupportedPlatformError(platform_name="unknown.com", supported=["leetcode", "codewars"])
+    assert "unknown.com" in str(exc)
+    assert "leetcode, codewars" in str(exc)
+
+
+def test_solutions_list_error_message():
+    exc = SolutionsListError(path="/non/existent/path")
+    assert "/non/existent/path" in str(exc)
+    assert "Solutions directory not found" in str(exc)

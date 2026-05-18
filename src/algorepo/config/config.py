@@ -20,7 +20,7 @@ def get_config_dir() -> Path:
 class Config(BaseModel):
     solutions_dir: Path = Path("~/Solutions").expanduser()
     language_priority: list[str] = ["Python3"]
-    editor: str = "nvim"
+    editor: str = "vim"
     open_editor: bool = True
     leetcode_session: str = ""
     leetcode_csrf_token: str = ""
@@ -78,7 +78,7 @@ general:
     - Python3
 
   # Your preferred editor command (e.g. "nano", "vim", "nvim", "code", etc.)
-  editor: nvim
+  editor: vim
 
   # Automatically open the editor after downloading a problem
   open_editor: true

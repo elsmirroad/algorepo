@@ -8,6 +8,7 @@ from algorepo.config import Config
 from algorepo.exceptions import (
     AuthorizationError,
     NetworkError,
+    NetworkErrorReason,
     ProblemErrorReason,
     ProblemNotFoundError,
 )
@@ -39,7 +40,7 @@ class LeetCodePlatform(Platform):
 
     def fetch(self, url: str) -> dict:
         if not self.config.leetcode_csrf_token or not self.config.leetcode_session:
-            raise AuthorizationError
+            raise AuthorizationError(platform_name="leetcode")
         slug = self._extract_slug(url)
         try:
             response = httpx.post(
@@ -60,7 +61,11 @@ class LeetCodePlatform(Platform):
             )
             response.raise_for_status()
         except httpx.HTTPError as e:
-            raise NetworkError(str(e)) from e
+            raise NetworkError(
+                platform_name="leetcode",
+                reason=NetworkErrorReason.HTTP_ERROR,
+                details=str(e),
+            ) from e
         return response.json()
 
     def parse(self, raw: dict, url: str) -> Problem:

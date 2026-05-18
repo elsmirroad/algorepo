@@ -24,7 +24,7 @@ def validate_url(url: str) -> str:
     domain = urlparse(url).hostname
     if domain in DOMAINS:
         return DOMAINS[domain]
-    raise UnsupportedPlatformError()
+    raise UnsupportedPlatformError(platform_name=str(domain), supported=list(NAMES.values()))
 
 
 def get_platform(name: str, config: Config) -> Platform:
