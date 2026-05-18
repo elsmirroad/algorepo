@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from algorepo.exceptions import UnsupportedLanguageError
+from algorepo.exceptions import LanguageErrorReason, UnsupportedLanguageError
 
 
 @dataclass
@@ -24,12 +24,18 @@ def select_language(
     if preferred:
         if preferred not in LANGUAGES:
             raise UnsupportedLanguageError(
-                reason="not_supported", language=preferred, supported=list(LANGUAGES.keys())
+                reason=LanguageErrorReason.NOT_SUPPORTED,
+                language=preferred,
+                supported=list(LANGUAGES.keys()),
+                available=available,
             )
         lang = LANGUAGES[preferred]
         if lang.platform_ids.get(platform) not in available:
             raise UnsupportedLanguageError(
-                reason="not_available", language=preferred, available=available
+                reason=LanguageErrorReason.NOT_AVAILABLE,
+                language=preferred,
+                supported=list(LANGUAGES.keys()),
+                available=available,
             )
         return lang
 
@@ -38,7 +44,12 @@ def select_language(
             lang = LANGUAGES[lang]
             if lang.platform_ids.get(platform) in available:
                 return lang
-    raise UnsupportedLanguageError(reason="no_match", available=available)
+    raise UnsupportedLanguageError(
+        reason=LanguageErrorReason.NO_MATCH,
+        language="",
+        supported=list(LANGUAGES.keys()),
+        available=available,
+    )
 
 
 LANGUAGES: dict[str, Language] = {

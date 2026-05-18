@@ -15,7 +15,7 @@ def render_solution_file(problem: Problem, language: Language, code: str) -> str
         f"{code}\n\n",
     ]
     tester: str = language.tester.get(problem.platform, "")
-    if tester: # Custom testers for Language and Platform
+    if tester:  # Custom testers for Language and Platform
         lines.insert(0, tester)
     if language.footer:
         lines.append(language.footer.format(description=problem.description))

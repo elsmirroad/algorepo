@@ -44,4 +44,3 @@ def format_list(solutions_list: dict) -> str:
             result += f"    {solution}\n"
         result += "\n"
     return result
-

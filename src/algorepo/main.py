@@ -3,8 +3,8 @@ import subprocess
 from pathlib import Path
 from typing import NamedTuple
 
-from algorepo.config import Config
-from algorepo.exceptions import ConfigurationError
+from algorepo.config import Config, get_config_dir
+from algorepo.exceptions import ConfigErrorReason, ConfigurationError
 from algorepo.languages import SNIPPETS, select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
@@ -27,7 +27,7 @@ class DownloadResult(NamedTuple):
 
 class Algorepo:
     def __init__(self):
-        self.config_path = Path("config.yaml")
+        self.config_path = get_config_dir() / "config.yaml"
         self.config = Config.from_yaml(self.config_path)
 
     def download_problem(
@@ -69,9 +69,11 @@ class Algorepo:
         try:
             subprocess.run([self.config.editor, str(filepath)])
         except FileNotFoundError:
-            raise ConfigurationError(reason="editor", editor=self.config.editor)
+            raise ConfigurationError(
+                reason=ConfigErrorReason.EDITOR, path=None, editor=self.config.editor
+            )
         except PermissionError:
-            raise ConfigurationError(reason="permission")
+            raise ConfigurationError(reason=ConfigErrorReason.PERMISSION, path=None, editor=None)
 
     def _save(self, problem: Problem, lang: Language, content: str) -> Path:
         filename: str = self.get_filename(

@@ -5,7 +5,6 @@ from algorepo.models import Problem
 
 
 class Platform(ABC):
-
     def __init__(self, config: Config) -> None:
         self.config = config
 

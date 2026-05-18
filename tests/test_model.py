@@ -14,7 +14,7 @@ def valid_problem_data():
         "description": "Some description",
         "url": "https://leetcode.com/problems/two-sum/",
         "code_snippets": {"python3": "print('hi')"},
-        "sample_test_case": "Input: ... Output: ..."
+        "sample_test_case": "Input: ... Output: ...",
     }
 
 
@@ -31,14 +31,17 @@ def test_platform_creation(valid_problem_data):
     assert problem.sample_test_case == "Input: ... Output: ..."
 
 
-@pytest.mark.parametrize("missing_field", [
-    "problem_id",
-    "title",
-    "platform",
-    "difficulty",
-    "description",
-    "url",
-])
+@pytest.mark.parametrize(
+    "missing_field",
+    [
+        "problem_id",
+        "title",
+        "platform",
+        "difficulty",
+        "description",
+        "url",
+    ],
+)
 def test_missing_required_fields(valid_problem_data, missing_field):
     data = valid_problem_data.copy()
     data.pop(missing_field)
@@ -58,7 +61,6 @@ def test_sample_test_case_optional(valid_problem_data):
 def test_url_auto_cast(valid_problem_data):
     problem = Problem(**valid_problem_data)
     assert isinstance(problem.url, HttpUrl)
-
 
 
 def test_code_snippets_default_isolation():

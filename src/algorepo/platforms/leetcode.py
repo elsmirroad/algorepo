@@ -5,7 +5,12 @@ from bs4 import BeautifulSoup
 from pydantic import HttpUrl
 
 from algorepo.config import Config
-from algorepo.exceptions import AuthorizationError, NetworkError, ProblemNotFoundError
+from algorepo.exceptions import (
+    AuthorizationError,
+    NetworkError,
+    ProblemErrorReason,
+    ProblemNotFoundError,
+)
 from algorepo.models import Problem
 from algorepo.platforms.base import Platform
 
@@ -61,7 +66,9 @@ class LeetCodePlatform(Platform):
     def parse(self, raw: dict, url: str) -> Problem:
         question = raw.get("data", {}).get("question")
         if not question:
-            raise ProblemNotFoundError(f"Problem was not found: {url}")
+            raise ProblemNotFoundError(
+                reason=ProblemErrorReason.NOT_FOUND, url=url, platform_name="leetcode"
+            )
         description = self._extract_description(question["content"])
         url = f"https://leetcode.com/problems/{self._extract_slug(url)}/"
         snippets = {s["langSlug"]: s["code"] for s in question["codeSnippets"]}
@@ -72,7 +79,7 @@ class LeetCodePlatform(Platform):
             difficulty=question["difficulty"],
             description=description,
             url=HttpUrl(url),
-            code_snippets=snippets, # Original snippets
+            code_snippets=snippets,  # Original snippets
             sample_test_case=question.get("sampleTestCase"),
             available_languages=list(snippets.keys()),
         )

@@ -12,6 +12,7 @@ def test_select_language_respects_priority():
     )
     assert lang.name == "Python3"
 
+
 def test_select_language_returns_none_if_unavailable():
     with pytest.raises(UnsupportedLanguageError):
         select_language(available=["C++"], platform="leetcode", priority=["Java"])

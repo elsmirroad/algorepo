@@ -13,6 +13,7 @@ def leetcode_config():
     config.leetcode_session = "mock_session"
     return config
 
+
 def test_leetcode_fetch(httpx_mock, leetcode_config):
     with open("tests/fixtures/leetcode_two_sum.json") as f:
         fixture = json.load(f)
@@ -21,6 +22,7 @@ def test_leetcode_fetch(httpx_mock, leetcode_config):
     platform = LeetCodePlatform(leetcode_config)
     raw = platform.fetch("https://leetcode.com/problems/two-sum/")
     assert raw["data"]["question"]["title"] == "Two Sum"
+
 
 def test_leetcode_parse(leetcode_config):
     with open("tests/fixtures/leetcode_two_sum.json") as f:

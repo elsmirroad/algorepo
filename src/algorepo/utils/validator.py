@@ -5,9 +5,9 @@ from algorepo.exceptions import UnsupportedPlatformError
 from algorepo.platforms import CodeWarsPlatform, LeetCodePlatform, Platform
 
 DOMAINS = {
-      "leetcode.com": "leetcode",
-      "www.codewars.com": "codewars",
-  }
+    "leetcode.com": "leetcode",
+    "www.codewars.com": "codewars",
+}
 
 PLATFORMS = {
     "leetcode": LeetCodePlatform,

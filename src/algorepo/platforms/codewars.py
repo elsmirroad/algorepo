@@ -4,7 +4,7 @@ import httpx
 from pydantic import HttpUrl
 
 from algorepo.config import Config
-from algorepo.exceptions import NetworkError, ProblemNotFoundError
+from algorepo.exceptions import NetworkError, ProblemErrorReason, ProblemNotFoundError
 from algorepo.languages import SNIPPETS
 from algorepo.models import Problem
 from algorepo.platforms.base import Platform
@@ -29,7 +29,9 @@ class CodeWarsPlatform(Platform):
 
     def parse(self, raw: dict, url: str) -> Problem:
         if not raw:
-            raise ProblemNotFoundError(f"Problem was not found: {url}")
+            raise ProblemNotFoundError(
+                reason=ProblemErrorReason.NOT_FOUND, url=url, platform_name="codewars"
+            )
 
         language = self._extract_lang(url)
         return Problem(

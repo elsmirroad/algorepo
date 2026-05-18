@@ -1,8 +1,17 @@
 general:
-    solutions_dir: ~/Solutions
-    language_priority:
-      - Python3
-    editor: code
-    open_editor: true
-    leetcode_session: "session_token"
-    leetcode_csrf_token: "csrf_token"
+  # The directory where your solutions will be saved
+  solutions_dir: ~/Solutions
+
+  # Your preferred languages in order of priority (e.g. Python3, C++, Java)
+  language_priority:
+    - Python3
+
+  # Your preferred editor command (e.g. "nano", "vim", "nvim", "code", etc.)
+  editor: nano
+
+  # Automatically open the editor after downloading a problem
+  open_editor: true
+
+  # LeetCode credentials (optional, required only for premium/private problems)
+  leetcode_session: ""
+  leetcode_csrf_token: ""
