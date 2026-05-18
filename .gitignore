@@ -23,6 +23,13 @@ __pycache__/
 .ruff_cache/
 *.log
 
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
 # IDE
 .vscode/
 .idea/

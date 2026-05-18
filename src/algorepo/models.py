@@ -12,3 +12,5 @@ class Problem(BaseModel):
     code_snippets: dict[str, str] = {}
     available_languages: list[str] = []
     sample_test_case: str | None = None
+    is_premium: bool = False
+    is_contest: bool = False

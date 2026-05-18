@@ -83,7 +83,12 @@ general:
   # Automatically open the editor after downloading a problem
   open_editor: true
 
-  # LeetCode credentials (optional, required only for premium/private problems)
+  # LeetCode Authentication (REQUIRED for LeetCode)
+  # Without these tokens, LeetCode's Cloudflare protection will block requests (403 Forbidden).
+  # How to get them:
+  # 1. Login to leetcode.com in your browser
+  # 2. Open Developer Tools (F12) -> Application (or Storage) -> Cookies
+  # 3. Copy the values for 'LEETCODE_SESSION' and 'csrftoken'
   leetcode_session: ""
   leetcode_csrf_token: ""
 """

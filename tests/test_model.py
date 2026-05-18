@@ -29,6 +29,8 @@ def test_platform_creation(valid_problem_data):
     assert isinstance(problem.url, HttpUrl)
     assert problem.code_snippets["python3"] == "print('hi')"
     assert problem.sample_test_case == "Input: ... Output: ..."
+    assert problem.is_premium is False
+    assert problem.is_contest is False
 
 
 @pytest.mark.parametrize(

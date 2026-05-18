@@ -21,6 +21,7 @@ QUERY = """
           questionFrontendId
           title
           difficulty
+          isPaidOnly
           content
           codeSnippets {
             langSlug
@@ -74,9 +75,19 @@ class LeetCodePlatform(Platform):
             raise ProblemNotFoundError(
                 reason=ProblemErrorReason.NOT_FOUND, url=url, platform_name="leetcode"
             )
-        description = self._extract_description(question["content"])
+        is_premium = question.get("isPaidOnly", False)
+
+        snippets = {}
+        if question.get("codeSnippets"):
+            snippets = {s["langSlug"]: s["code"] for s in question["codeSnippets"]}
+        else:
+            raise ProblemNotFoundError(
+                reason=ProblemErrorReason.UNAVAILABLE, url=url, platform_name="leetcode"
+            )
+
+        description = self._extract_description(question.get("content", ""))
         url = f"https://leetcode.com/problems/{self._extract_slug(url)}/"
-        snippets = {s["langSlug"]: s["code"] for s in question["codeSnippets"]}
+
         return Problem(
             problem_id=question["questionFrontendId"],
             title=question["title"],
@@ -84,9 +95,10 @@ class LeetCodePlatform(Platform):
             difficulty=question["difficulty"],
             description=description,
             url=HttpUrl(url),
-            code_snippets=snippets,  # Original snippets
+            code_snippets=snippets,
             sample_test_case=question.get("sampleTestCase"),
             available_languages=list(snippets.keys()),
+            is_premium=is_premium,
         )
 
     @staticmethod
