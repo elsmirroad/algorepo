@@ -1,3 +1,4 @@
+import string
 import pytest
 
 from algorepo.languages import Language
@@ -34,11 +35,13 @@ def valid_language_data():
 def test_render(valid_problem_data, valid_language_data):
     problem = Problem(**valid_problem_data)
     language = Language(**valid_language_data)
+    template = string.Template("$tester\n$header\n$description\n$code\n$footer")
 
     file = render_solution_file(
         problem=problem,
         language=language,
         code=problem.code_snippets[language.platform_ids["leetcode"]],
+        template=template,
     )
 
     assert "from lc import *" in file

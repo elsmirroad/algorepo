@@ -19,13 +19,14 @@ def get_config_dir() -> Path:
 
 class Config(BaseModel):
     solutions_dir: Path = Path("~/Solutions").expanduser()
+    templates_dir: Path = get_config_dir() / "templates"
     language_priority: list[str] = ["Python3"]
     editor: str = "vim"
     open_editor: bool = True
     leetcode_session: str = ""
     leetcode_csrf_token: str = ""
 
-    @field_validator("solutions_dir", mode="before")
+    @field_validator("solutions_dir", "templates_dir", mode="before")
     @classmethod
     def expand_path(cls, v: str | Path) -> Path:
         return Path(v).expanduser()
@@ -38,7 +39,7 @@ class Config(BaseModel):
             try:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 with open(path, "w", encoding="utf-8") as f:
-                    f.write(DEFAULT_CONFIG_TEMPLATE)
+                    f.write(get_default_config_template())
                 console.print(f"[green]✓ Created default configuration template at: {path}[/green]")
             except Exception as e:
                 console.print(f"[yellow]⚠ Could not create default config at {path}: {e}[/yellow]")
@@ -68,10 +69,27 @@ class Config(BaseModel):
             )
 
 
-DEFAULT_CONFIG_TEMPLATE = """\
+def get_default_config_template() -> str:
+    """Generate platform-aware default configuration template"""
+    config_dir = get_config_dir()
+    templates_dir = config_dir / "templates"
+
+    if sys.platform == "win32":
+        sol_example = "%USERPROFILE%\\Solutions"
+        tmpl_desc = "If not set, uses %APPDATA%\\algorepo\\templates"
+    else:
+        sol_example = "~/Solutions"
+        tmpl_desc = "If not set, uses ~/.config/algorepo/templates"
+
+    return f"""\
 general:
   # The directory where your solutions will be saved
+  # Example: {sol_example}
   solutions_dir: ~/Solutions
+
+  # Custom templates directory.
+  # {tmpl_desc}
+  templates_dir: {templates_dir}
 
   # Your preferred languages in order of priority (e.g. Python3, C++, Java)
   language_priority:

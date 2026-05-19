@@ -9,7 +9,7 @@ from algorepo.exceptions import (
     ConfigurationError,
     SolutionsListError,
 )
-from algorepo.languages import SNIPPETS, select_language
+from algorepo.languages import select_language
 from algorepo.languages.languages import Language
 from algorepo.models import Problem
 from algorepo.platforms.base import Platform
@@ -18,6 +18,8 @@ from algorepo.utils import (
     get_list,
     get_platform,
     get_platform_list,
+    load_snippet,
+    load_template,
     render_solution_file,
     validate_url,
 )
@@ -53,10 +55,19 @@ class Algorepo:
             preferred=problem.preffered_lang or language,
         )
 
+        template = load_template(language_name=lang.name, config=self.config)
+        snippet = load_snippet(
+            language_name=lang.name, extension=lang.extension, config=self.config
+        )
+
+        platform_code = problem.code_snippets.get(lang.platform_ids[platform_name])
+        final_code = platform_code if platform_code else snippet
+
         content: str = render_solution_file(
             problem=problem,
             language=lang,
-            code=problem.code_snippets.get(lang.platform_ids[platform_name]) or SNIPPETS[lang.name],
+            code=final_code,
+            template=template,
         )
         filepath: Path = self._save(problem=problem, lang=lang, content=content)
 

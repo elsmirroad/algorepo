@@ -10,7 +10,6 @@ from algorepo.exceptions import (
     ProblemErrorReason,
     ProblemNotFoundError,
 )
-from algorepo.languages import SNIPPETS
 from algorepo.models import Problem
 from algorepo.platforms.base import Platform
 
@@ -61,7 +60,7 @@ class CodeWarsPlatform(Platform):
             description=raw["description"],
             url=HttpUrl(url),
             preffered_lang=language if language else None,
-            code_snippets=SNIPPETS,  # Custom Snippets
+            code_snippets={},
             available_languages=raw["languages"],
         )
 
