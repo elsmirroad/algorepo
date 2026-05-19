@@ -2,7 +2,14 @@ from algorepo.utils.aggregator import get_list, get_platform_list
 from algorepo.utils.formatter import format_filename, format_list, format_result
 from algorepo.utils.loader import load_snippet, load_template
 from algorepo.utils.renderer import render_solution_file
-from algorepo.utils.validator import DOMAINS, NAMES, PLATFORMS, get_platform, validate_url
+from algorepo.utils.validator import (
+    DOMAINS,
+    NAMES,
+    NAMES_INV,
+    PLATFORMS,
+    get_platform,
+    validate_url,
+)
 
 __all__ = [
     "format_result",
@@ -18,4 +25,5 @@ __all__ = [
     "DOMAINS",
     "PLATFORMS",
     "NAMES",
+    "NAMES_INV",
 ]

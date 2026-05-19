@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import urlparse
 
 import httpx
@@ -10,7 +11,7 @@ from algorepo.exceptions import (
     ProblemErrorReason,
     ProblemNotFoundError,
 )
-from algorepo.models import Problem
+from algorepo.models import Problem, TestCase
 from algorepo.platforms.base import Platform
 
 
@@ -21,10 +22,11 @@ class CodeWarsPlatform(Platform):
         super().__init__(config=config)
 
     def fetch(self, url: str) -> dict:
-        slug = self._extract_slug(url)
+        slug = self._extract_slug(url=url)
         try:
             response = httpx.get(
                 url=f"{self.REST_URL}/{slug}",
+                timeout=30,
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as e:
@@ -51,7 +53,7 @@ class CodeWarsPlatform(Platform):
                 reason=ProblemErrorReason.NOT_FOUND, url=url, platform_name="codewars"
             )
 
-        language = self._extract_lang(url)
+        language = self._extract_lang(url=url)
         return Problem(
             problem_id=raw["id"],
             title=raw["name"],
@@ -63,6 +65,21 @@ class CodeWarsPlatform(Platform):
             code_snippets={},
             available_languages=raw["languages"],
         )
+
+    def get_filename(self, problem: Problem) -> str:
+        return f"{problem.title} | {problem.problem_id}"
+
+    def extract_test_cases(self, text: str) -> list[TestCase]:
+        """
+        Extracts test cases from CodeWars description.
+        TODO: Implement proper Markdown/Code parsing for CodeWars.
+        """
+        return []
+
+    def get_tester_dir(self, language_name: str) -> Path:
+        """Returns the directory containing tester libraries for CodeWars."""
+        norm_name = language_name.lower().replace("++", "pp").replace("#", "sharp")
+        return self.config.solutions_dir / "testers" / "codewars" / norm_name
 
     @staticmethod
     def _extract_slug(url: str) -> str:
@@ -79,7 +96,6 @@ class CodeWarsPlatform(Platform):
         """Extract language from link if present"""
         parts = urlparse(url).path.strip("/").split("/")
 
-        # Known actions keywords
         for keyword in ("train", "solutions", "discuss", "fork", "translations"):
             try:
                 idx = parts.index(keyword)

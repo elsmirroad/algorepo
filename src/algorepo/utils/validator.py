@@ -19,6 +19,8 @@ NAMES = {
     "codewars": "CodeWars",
 }
 
+NAMES_INV = {v: k for k, v in NAMES.items()}
+
 
 def validate_url(url: str) -> str:
     domain = urlparse(url).hostname

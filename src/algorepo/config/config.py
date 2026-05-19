@@ -4,7 +4,6 @@ from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, ValidationError, field_validator
-from rich.console import Console
 
 from algorepo.exceptions import ConfigErrorReason, ConfigurationError
 
@@ -33,16 +32,8 @@ class Config(BaseModel):
 
     @classmethod
     def from_yaml(cls, path: Path) -> "Config":
-        """Load config from YAML file"""
+        """Load config from YAML file. Returns default config if file doesn't exist."""
         if not path.exists():
-            console = Console()
-            try:
-                path.parent.mkdir(parents=True, exist_ok=True)
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(get_default_config_template())
-                console.print(f"[green]✓ Created default configuration template at: {path}[/green]")
-            except Exception as e:
-                console.print(f"[yellow]⚠ Could not create default config at {path}: {e}[/yellow]")
             return cls()
 
         try:
@@ -52,11 +43,7 @@ class Config(BaseModel):
             raise ConfigurationError(
                 reason=ConfigErrorReason.PERMISSION, path=str(path), editor=None
             )
-        except yaml.YAMLError:
-            raise ConfigurationError(
-                reason=ConfigErrorReason.INVALID_FORMAT, path=str(path), editor=None
-            )
-        except Exception:
+        except (yaml.YAMLError, Exception):
             raise ConfigurationError(
                 reason=ConfigErrorReason.INVALID_FORMAT, path=str(path), editor=None
             )

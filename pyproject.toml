@@ -10,6 +10,7 @@ dependencies = [
     "rich>=13.0",
     "beautifulsoup4>=4.14.3",
     "lxml>=6.0.2",
+    "sortedcontainers>=2.4.0",
 ]
 
 [project.optional-dependencies]
@@ -35,7 +36,9 @@ line-length = 100
 select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
-"src/algorepo/templates/*" = ["N999", "F401", "F841", "E501"]
+"src/algorepo/templates/*" = ["ALL"]
+"src/algorepo/testers/templates/*" = ["ALL"]
+"tests/*" = ["F401", "F841"]
 
 [tool.pyright]
 pythonVersion = "3.10"
@@ -43,6 +46,11 @@ typeCheckingMode = "basic"
 venvPath = "."
 venv = ".venv"
 include = ["src", "tests"]
+exclude = [
+    "src/algorepo/templates/**",
+    "src/algorepo/testers/templates/**",
+    "**/__pycache__",
+]
 
 [dependency-groups]
 dev = [

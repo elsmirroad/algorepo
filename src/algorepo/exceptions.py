@@ -16,6 +16,7 @@ class ConfigErrorReason(str, Enum):
     INVALID_FORMAT = "invalid_format"
     EDITOR = "editor"
     PERMISSION = "permission"
+    CREATION_FAILED = "creation_failed"
 
 
 class NetworkErrorReason(str, Enum):
@@ -24,6 +25,16 @@ class NetworkErrorReason(str, Enum):
     TIMEOUT = "timeout"
     DECODING_ERROR = "decoding_error"
     UNKNOWN = "unknown"
+
+
+class DependencyErrorReason(str, Enum):
+    MISSING_BINARY = "missing_binary"
+
+
+class TesterErrorReason(str, Enum):
+    COMPILATION_FAILED = "compilation_failed"
+    RUNTIME_ERROR = "runtime_error"
+    LIBRARY_NOT_FOUND = "library_not_found"
 
 
 class AlgorepoError(Exception):
@@ -127,10 +138,12 @@ class ConfigurationError(AlgorepoError):
         reason: ConfigErrorReason,
         path: str | None,
         editor: str | None,
+        details: str | None = None,
     ) -> None:
         self.reason = reason
         self.path = path
         self.editor = editor
+        self.details = details
 
         if self.reason == ConfigErrorReason.INVALID_FORMAT:
             message = f"Invalid config format in: {self.path}"
@@ -143,6 +156,8 @@ class ConfigurationError(AlgorepoError):
                 message = f"Permission denied: cannot read config file {self.path}"
             else:
                 message = "Permission denied: cannot open editor"
+        elif self.reason == ConfigErrorReason.CREATION_FAILED:
+            message = f"Failed to create default config at {self.path}: {self.details}"
         else:
             message = "Configuration error"
 
@@ -182,4 +197,43 @@ class AuthorizationError(AlgorepoError):
             f"Authorization failed for {self.platform_name}. "
             "Please check your credentials in the configuration file."
         )
+        super().__init__(message)
+
+
+class DependencyError(AlgorepoError):
+    """System dependency error (missing compilers, runtimes)"""
+
+    def __init__(self, reason: DependencyErrorReason, language: str, missing: list[str]) -> None:
+        self.reason = reason
+        self.language = language
+        self.missing = missing
+
+        if self.reason == DependencyErrorReason.MISSING_BINARY:
+            message = (
+                f"Missing required tools for {self.language}: {', '.join(self.missing)}. "
+                "Please install them to run tests."
+            )
+        else:
+            message = f"Dependency error for {self.language}"
+
+        super().__init__(message)
+
+
+class TesterError(AlgorepoError):
+    """Error during test execution"""
+
+    def __init__(self, reason: TesterErrorReason, language: str, details: str) -> None:
+        self.reason = reason
+        self.language = language
+        self.details = details
+
+        if self.reason == TesterErrorReason.COMPILATION_FAILED:
+            message = f"Compilation failed for {self.language}:\n{self.details}"
+        elif self.reason == TesterErrorReason.RUNTIME_ERROR:
+            message = f"Runtime error during {self.language} tests:\n{self.details}"
+        elif self.reason == TesterErrorReason.LIBRARY_NOT_FOUND:
+            message = f"Tester library not found for {self.language} at: {self.details}"
+        else:
+            message = f"Tester error for {self.language}: {self.details}"
+
         super().__init__(message)

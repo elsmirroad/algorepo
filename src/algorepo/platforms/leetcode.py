@@ -1,3 +1,5 @@
+import re
+from pathlib import Path
 from urllib.parse import urlparse
 
 import httpx
@@ -12,7 +14,7 @@ from algorepo.exceptions import (
     ProblemErrorReason,
     ProblemNotFoundError,
 )
-from algorepo.models import Problem
+from algorepo.models import Problem, TestCase
 from algorepo.platforms.base import Platform
 
 QUERY = """
@@ -42,10 +44,10 @@ class LeetCodePlatform(Platform):
     def fetch(self, url: str) -> dict:
         if not self.config.leetcode_csrf_token or not self.config.leetcode_session:
             raise AuthorizationError(platform_name="leetcode")
-        slug = self._extract_slug(url)
+        slug = self._extract_slug(url=url)
         try:
             response = httpx.post(
-                self.GRAPHQL_URL,
+                url=self.GRAPHQL_URL,
                 json={"query": QUERY, "variables": {"titleSlug": slug}},
                 headers={
                     "Content-Type": "application/json",
@@ -85,8 +87,8 @@ class LeetCodePlatform(Platform):
                 reason=ProblemErrorReason.UNAVAILABLE, url=url, platform_name="leetcode"
             )
 
-        description = self._extract_description(question.get("content", ""))
-        url = f"https://leetcode.com/problems/{self._extract_slug(url)}/"
+        description = self._extract_description(response_text=question.get("content", ""))
+        url = f"https://leetcode.com/problems/{self._extract_slug(url=url)}/"
 
         return Problem(
             problem_id=question["questionFrontendId"],
@@ -100,6 +102,60 @@ class LeetCodePlatform(Platform):
             available_languages=list(snippets.keys()),
             is_premium=is_premium,
         )
+
+    def get_filename(self, problem: Problem) -> str:
+        return f"{problem.problem_id}. {problem.title}"
+
+    def extract_test_cases(self, text: str) -> list[TestCase]:
+        """
+        Parses LeetCode-style description to extract test cases.
+        """
+        tests: list[TestCase] = []
+        p, t = "", 0
+
+        def split_vars(s: str, prepend: str = ", ") -> list[str]:
+            out = []
+            if m := re.split(r"\, [a-zA-Z_]+\d* =\s*", prepend + s):
+                for i in range(len(m)):
+                    if m[i]:
+                        out.append(m[i].strip())
+            return out
+
+        lines = text.splitlines()
+        for s in lines:
+            s = s.strip()
+            s = re.sub(r"^(#|//|--)\s*", "", s)
+
+            if s.startswith("Input:"):
+                t = 1
+                tests.append(TestCase(inputs=[], expected=""))
+                p = s[6:].strip()
+            elif s.startswith("Output:"):
+                if tests:
+                    tests[-1].inputs = split_vars(p)
+                p, t = s[7:].strip(), 2
+            elif t == 2 and (
+                s == ""
+                or any(
+                    s.startswith(marker)
+                    for marker in ("Example", "Explanation", "Note", "Constraints", "Follow-up")
+                )
+            ):
+                if tests:
+                    tests[-1].expected = p.strip()
+                p, t = "", 0
+            elif t != 0:
+                p += " " + s
+
+        if t == 2 and tests:
+            tests[-1].expected = p.strip()
+
+        return tests
+
+    def get_tester_dir(self, language_name: str) -> Path:
+        """Returns the directory containing tester libraries for LeetCode."""
+        norm_name = language_name.lower().replace("++", "pp").replace("#", "sharp")
+        return self.config.solutions_dir / "testers" / "leetcode" / norm_name
 
     @staticmethod
     def _extract_slug(url: str) -> str:

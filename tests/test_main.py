@@ -1,3 +1,4 @@
+from pathlib import Path
 
 import pytest
 from pydantic import HttpUrl
@@ -23,12 +24,6 @@ def mock_config(tmp_path):
 def mock_algorepo(mocker, mock_config):
     mocker.patch("algorepo.main.Config.from_yaml", return_value=mock_config)
     return Algorepo()
-
-
-def test_algorepo_get_filename(mock_algorepo):
-    assert mock_algorepo.get_filename("leetcode", "1", "Two Sum") == "1. Two Sum"
-    assert mock_algorepo.get_filename("codewars", "123", "Even or Odd") == "Even or Odd | 123"
-    assert mock_algorepo.get_filename("unknown", "1", "Some Problem") == "Some Problem"
 
 
 def test_algorepo_open_in_editor_success(mocker, mock_algorepo, tmp_path):
@@ -94,12 +89,24 @@ def test_algorepo_download_problem(mocker, mock_algorepo, tmp_path):
         extension=".py",
         platform_ids={"leetcode": "python"},
         comment_symbol="#",
-        tester={}
+        tester={},
     )
 
     class MockPlatform(Platform):
-        def fetch(self, url: str) -> dict: return {}
-        def parse(self, raw: dict, url: str) -> Problem: return problem
+        def fetch(self, url: str) -> dict:
+            return {}
+
+        def parse(self, raw: dict, url: str) -> Problem:
+            return problem
+
+        def get_filename(self, problem: Problem) -> str:
+            return f"{problem.problem_id}. {problem.title}"
+
+        def extract_test_cases(self, text: str):
+            return []
+
+        def get_tester_dir(self, language_name: str) -> Path:
+            return Path("/tmp")
 
     mocker.patch("algorepo.main.validate_url", return_value="leetcode")
     mocker.patch("algorepo.main.get_platform", return_value=MockPlatform(mock_algorepo.config))
@@ -107,7 +114,7 @@ def test_algorepo_download_problem(mocker, mock_algorepo, tmp_path):
     mocker.patch("algorepo.main.render_solution_file", return_value="# Code here")
     mocker.patch("os.chdir")
 
-    result = mock_algorepo.download_problem(url)
+    result = mock_algorepo.download_problem(url=url, language=None, open_editor=True)
 
     assert isinstance(result, DownloadResult)
     assert result.problem == problem

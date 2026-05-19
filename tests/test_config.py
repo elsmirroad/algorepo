@@ -16,12 +16,11 @@ def test_config_from_yaml(tmp_path):
     assert config.language_priority == ["Java", "Python3"]
 
 
-def test_config_missing_file_creates_template(tmp_path):
+def test_config_missing_file_returns_defaults(tmp_path):
     target_path = tmp_path / "nonexistent.yaml"
     config = Config.from_yaml(target_path)
     assert isinstance(config, Config)
-    assert target_path.exists()
-    assert "solutions_dir: ~/Solutions" in target_path.read_text()
+    assert not target_path.exists()
 
 
 def test_get_config_dir_win32(mocker):
@@ -35,15 +34,6 @@ def test_get_config_dir_unix(mocker):
     mocker.patch("sys.platform", "linux")
     path = get_config_dir()
     assert ".config/algorepo" in str(path)
-
-
-def test_config_from_yaml_write_error(mocker, tmp_path):
-    target_path = tmp_path / "nonexistent.yaml"
-    mocker.patch("pathlib.Path.mkdir", side_effect=PermissionError)
-    config = Config.from_yaml(target_path)
-    # Should fallback to default config without raising Exception
-    assert isinstance(config, Config)
-    assert not target_path.exists()
 
 
 def test_config_from_yaml_permission_error(mocker, tmp_path):

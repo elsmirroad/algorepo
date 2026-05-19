@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import typer
 from click import Command, Context, UsageError
 from rich.console import Console
@@ -6,6 +8,7 @@ from typer.core import TyperGroup
 from algorepo.exceptions import AlgorepoError, ConfigurationError, SolutionsListError
 from algorepo.main import Algorepo, DownloadResult
 from algorepo.utils import format_list, format_result
+from algorepo.utils.workspace import get_problem_path
 
 
 class DefaultCommandGroup(TyperGroup):
@@ -55,6 +58,34 @@ def download(
         if not no_editor:
             client.open_in_editor(result.filepath)
 
+    except AlgorepoError as e:
+        console.print(f"[red]✗ Error:[/red] {e}")
+        raise typer.Exit(1)
+
+
+@app.command()
+def test(
+    problem: str = typer.Argument(..., help="Problem ID, name, or path to the solution file"),
+    platform: str = typer.Option(
+        "leetcode", "--platform", "-p", help="Platform name (default: leetcode)"
+    ),
+):
+    """Run tests for a solution file."""
+    repo = Algorepo()
+
+    path = Path(problem)
+    if not path.exists():
+        path = get_problem_path(repo.config.solutions_dir, platform, problem)
+
+    if not path or not path.exists():
+        console.print(f"[red]✗ Error:[/red] Could not find solution file for '{problem}'")
+        raise typer.Exit(1)
+
+    try:
+        with console.status(f"[bold green]Running tests for {path.name}...", spinner="dots"):
+            pass
+
+        repo.test_problem(path)
     except AlgorepoError as e:
         console.print(f"[red]✗ Error:[/red] {e}")
         raise typer.Exit(1)

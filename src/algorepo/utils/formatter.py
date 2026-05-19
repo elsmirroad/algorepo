@@ -48,11 +48,11 @@ def format_list(solutions_list: dict) -> str:
     return result
 
 
-def format_filename(filename: str) -> str:
+def format_filename(name: str) -> str:
     """
     Remove characters that are invalid for filenames across Windows, macOS, and Linux.
     Also prevents path traversal by removing slashes.
     """
-    sanitized = re.sub(r'[<>:"/\\|?*]', "_", filename)
+    sanitized = re.sub(r'[<>:"/\\|?*]', "_", name)
     sanitized = sanitized.strip(". ")
     return sanitized if sanitized else "problem"

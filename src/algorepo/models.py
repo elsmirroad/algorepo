@@ -1,6 +1,18 @@
 from pydantic import BaseModel, HttpUrl
 
 
+class TestCase(BaseModel):
+    __test__ = False
+    inputs: list[str]  # Raw strings of arguments, e.g. ["[2,7,11,15]", "9"]
+    expected: str  # Raw string of expected result, e.g. "[0,1]"
+
+
+class FunctionSignature(BaseModel):
+    name: str
+    args: list[tuple[str, str]]
+    return_type: str
+
+
 class Problem(BaseModel):
     problem_id: str
     title: str
