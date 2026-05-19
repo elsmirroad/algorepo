@@ -104,8 +104,19 @@ class LeetCodePlatform(Platform):
     @staticmethod
     def _extract_slug(url: str) -> str:
         """Extract slug from link"""
-        extracted = urlparse(url)
-        return extracted.path.split("/")[2]
+        path = urlparse(url).path.strip("/")
+        parts = path.split("/")
+        try:
+            idx = parts.index("problems")
+            if idx + 1 < len(parts):
+                return parts[idx + 1]
+            return parts[idx]
+        except (ValueError, IndexError):
+            if len(parts) >= 2:
+                return parts[1]
+            raise ProblemNotFoundError(
+                reason=ProblemErrorReason.NOT_FOUND, url=url, platform_name="leetcode"
+            )
 
     @staticmethod
     def _extract_description(response_text: str) -> str:

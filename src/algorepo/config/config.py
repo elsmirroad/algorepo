@@ -83,6 +83,12 @@ def get_default_config_template() -> str:
 
     return f"""\
 general:
+  # ===========================================================================
+  # Algorepo Configuration File
+  # IMPORTANT: This file contains sensitive authentication tokens.
+  # It is recommended to restrict access to this file (e.g., chmod 600).
+  # ===========================================================================
+
   # The directory where your solutions will be saved
   # Example: {sol_example}
   solutions_dir: ~/Solutions

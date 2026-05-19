@@ -1,4 +1,3 @@
-import os
 import subprocess
 from pathlib import Path
 from typing import NamedTuple
@@ -15,6 +14,7 @@ from algorepo.models import Problem
 from algorepo.platforms.base import Platform
 from algorepo.utils import (
     NAMES,
+    format_filename,
     get_list,
     get_platform,
     get_platform_list,
@@ -94,11 +94,12 @@ class Algorepo:
         filename: str = self.get_filename(
             platform=problem.platform, problem_id=problem.problem_id, problem_title=problem.title
         )
+        filename = format_filename(filename)
+
         extension: str = lang.extension
         platform: str = NAMES.get(problem.platform, problem.platform)
         path: Path = self.config.solutions_dir / platform / f"{filename}{extension}"
         path.parent.mkdir(parents=True, exist_ok=True)
-        os.chdir(path.parent)
 
         with open(path, "w", encoding="UTF-8") as file:
             file.write(content)

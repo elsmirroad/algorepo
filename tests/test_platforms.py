@@ -42,7 +42,7 @@ def test_leetcode_parse_premium(leetcode_config):
     """Simulate a premium task that has been successfully fetched (user has Premium)"""
     with open("tests/fixtures/leetcode_two_sum.json") as f:
         raw = json.load(f)
-    
+
     raw["data"]["question"]["isPaidOnly"] = True
 
     platform = LeetCodePlatform(leetcode_config)
@@ -62,10 +62,10 @@ def test_leetcode_parse_premium_unavailable(leetcode_config):
     raw["data"]["question"]["codeSnippets"] = None
 
     platform = LeetCodePlatform(leetcode_config)
-    
-    from algorepo.exceptions import ProblemNotFoundError, ProblemErrorReason
+
+    from algorepo.exceptions import ProblemErrorReason, ProblemNotFoundError
     with pytest.raises(ProblemNotFoundError) as exc:
         platform.parse(raw, "https://leetcode.com/problems/two-sum/")
-        
+
     assert exc.value.reason == ProblemErrorReason.UNAVAILABLE
     assert "unavailable" in str(exc.value)

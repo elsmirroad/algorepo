@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 from pydantic import HttpUrl
@@ -7,8 +6,8 @@ from typer.testing import CliRunner
 
 from algorepo.cli import app
 from algorepo.exceptions import (
-    ConfigurationError,
     ConfigErrorReason,
+    ConfigurationError,
     NetworkError,
     NetworkErrorReason,
     SolutionsListError,
@@ -16,7 +15,6 @@ from algorepo.exceptions import (
 from algorepo.languages import Language
 from algorepo.main import DownloadResult
 from algorepo.models import Problem
-
 
 runner = CliRunner()
 
@@ -29,8 +27,14 @@ def mock_algorepo_class(mocker):
 def test_cli_default_command_url_fallback(mock_algorepo_class):
     """Test that passing a URL directly defaults to the download command"""
     mock_instance = mock_algorepo_class.return_value
-    
-    lang = Language(name="Python3", extension=".py", platform_ids={"leetcode": "python"}, comment_symbol="#", tester=None)
+
+    lang = Language(
+        name="Python3",
+        extension=".py",
+        platform_ids={"leetcode": "python"},
+        comment_symbol="#",
+        tester={},
+    )
     problem = Problem(
         problem_id="1",
         title="Two Sum",
@@ -41,11 +45,13 @@ def test_cli_default_command_url_fallback(mock_algorepo_class):
         available_languages=["python"],
         code_snippets={},
     )
-    mock_result = DownloadResult(filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang)
+    mock_result = DownloadResult(
+        filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang
+    )
     mock_instance.download_problem.return_value = mock_result
 
     result = runner.invoke(app, ["https://leetcode.com/problems/two-sum/"])
-    
+
     assert result.exit_code == 0
     mock_instance.download_problem.assert_called_once()
     assert "Two Sum" in result.stdout
@@ -59,8 +65,14 @@ def test_cli_default_command_invalid():
 
 def test_cli_download_success(mock_algorepo_class):
     mock_instance = mock_algorepo_class.return_value
-    
-    lang = Language(name="Python3", extension=".py", platform_ids={"leetcode": "python"}, comment_symbol="#", tester=None)
+
+    lang = Language(
+        name="Python3",
+        extension=".py",
+        platform_ids={"leetcode": "python"},
+        comment_symbol="#",
+        tester={},
+    )
     problem = Problem(
         problem_id="1",
         title="Two Sum",
@@ -71,11 +83,16 @@ def test_cli_download_success(mock_algorepo_class):
         available_languages=["python"],
         code_snippets={},
     )
-    mock_result = DownloadResult(filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang)
+    mock_result = DownloadResult(
+        filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang
+    )
     mock_instance.download_problem.return_value = mock_result
 
-    result = runner.invoke(app, ["download", "https://leetcode.com/problems/two-sum/", "--lang", "python", "--no-editor"])
-    
+    result = runner.invoke(
+        app,
+        ["download", "https://leetcode.com/problems/two-sum/", "--lang", "python", "--no-editor"],
+    )
+
     assert result.exit_code == 0
     mock_instance.download_problem.assert_called_once_with(
         url="https://leetcode.com/problems/two-sum/",
@@ -88,8 +105,14 @@ def test_cli_download_success(mock_algorepo_class):
 
 def test_cli_download_with_editor(mock_algorepo_class):
     mock_instance = mock_algorepo_class.return_value
-    
-    lang = Language(name="Python3", extension=".py", platform_ids={"leetcode": "python"}, comment_symbol="#", tester=None)
+
+    lang = Language(
+        name="Python3",
+        extension=".py",
+        platform_ids={"leetcode": "python"},
+        comment_symbol="#",
+        tester={},
+    )
     problem = Problem(
         problem_id="1",
         title="Two Sum",
@@ -100,11 +123,13 @@ def test_cli_download_with_editor(mock_algorepo_class):
         available_languages=["python"],
         code_snippets={},
     )
-    mock_result = DownloadResult(filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang)
+    mock_result = DownloadResult(
+        filepath=Path("/tmp/1. Two Sum.py"), problem=problem, language=lang
+    )
     mock_instance.download_problem.return_value = mock_result
 
     result = runner.invoke(app, ["download", "https://leetcode.com/problems/two-sum/"])
-    
+
     assert result.exit_code == 0
     mock_instance.open_in_editor.assert_called_once_with(mock_result.filepath)
 
@@ -118,7 +143,7 @@ def test_cli_download_error(mock_algorepo_class):
     )
 
     result = runner.invoke(app, ["download", "https://leetcode.com/problems/two-sum/"])
-    
+
     assert result.exit_code == 1
     assert "Error:" in result.stdout
     assert "500 Server Error" in result.stdout
@@ -129,7 +154,7 @@ def test_cli_config_success(mock_algorepo_class):
     mock_instance.config_path = Path("/tmp/config.yaml")
 
     result = runner.invoke(app, ["config"])
-    
+
     assert result.exit_code == 0
     mock_instance.open_in_editor.assert_called_once_with(Path("/tmp/config.yaml"))
 
@@ -141,7 +166,7 @@ def test_cli_config_error(mock_algorepo_class):
     )
 
     result = runner.invoke(app, ["config"])
-    
+
     assert result.exit_code == 1
     assert "Error:" in result.stdout
     assert "Failed to open editor 'vim'" in result.stdout
@@ -152,7 +177,7 @@ def test_cli_list_solutions_success(mock_algorepo_class):
     mock_instance.get_info.return_value = {"LeetCode": ["1. Two Sum.py"]}
 
     result = runner.invoke(app, ["list"])
-    
+
     assert result.exit_code == 0
     mock_instance.get_info.assert_called_once_with(platform=None)
     assert "SOLUTIONS" in result.stdout
@@ -165,7 +190,7 @@ def test_cli_list_solutions_error(mock_algorepo_class):
     mock_instance.get_info.side_effect = SolutionsListError(path="/tmp/Solutions")
 
     result = runner.invoke(app, ["list"])
-    
+
     assert result.exit_code == 1
     assert "Error:" in result.stdout
     assert "Solutions directory not found" in result.stdout

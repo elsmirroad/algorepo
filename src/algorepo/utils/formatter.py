@@ -1,3 +1,5 @@
+import re
+
 colors: dict[str, tuple] = {
     "g": ("[green]", "[/green]"),
     "y": ("[yellow]", "[/yellow]"),
@@ -44,3 +46,13 @@ def format_list(solutions_list: dict) -> str:
             result += f"    {solution}\n"
         result += "\n"
     return result
+
+
+def format_filename(filename: str) -> str:
+    """
+    Remove characters that are invalid for filenames across Windows, macOS, and Linux.
+    Also prevents path traversal by removing slashes.
+    """
+    sanitized = re.sub(r'[<>:"/\\|?*]', "_", filename)
+    sanitized = sanitized.strip(". ")
+    return sanitized if sanitized else "problem"

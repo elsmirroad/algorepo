@@ -1,4 +1,5 @@
 import string
+
 import pytest
 
 from algorepo.languages import Language

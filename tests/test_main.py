@@ -1,6 +1,3 @@
-import os
-import subprocess
-from pathlib import Path
 
 import pytest
 from pydantic import HttpUrl
@@ -68,7 +65,7 @@ def test_algorepo_get_info_success(mock_algorepo, tmp_path):
     leetcode_dir = solutions_dir / "LeetCode"
     leetcode_dir.mkdir(parents=True)
     (leetcode_dir / "1. Two Sum.py").touch()
-    
+
     info = mock_algorepo.get_info()
     assert "LeetCode" in info
     assert info["LeetCode"] == ["1. Two Sum.py"]
@@ -80,7 +77,7 @@ def test_algorepo_get_info_success(mock_algorepo, tmp_path):
 
 def test_algorepo_download_problem(mocker, mock_algorepo, tmp_path):
     url = "https://leetcode.com/problems/two-sum/"
-    
+
     problem = Problem(
         problem_id="1",
         title="Two Sum",
@@ -91,19 +88,19 @@ def test_algorepo_download_problem(mocker, mock_algorepo, tmp_path):
         available_languages=["python"],
         code_snippets={"python": "def twoSum(): pass"},
     )
-    
+
     lang = Language(
-        name="Python3", 
-        extension=".py", 
+        name="Python3",
+        extension=".py",
         platform_ids={"leetcode": "python"},
         comment_symbol="#",
-        tester=None
+        tester={}
     )
 
     class MockPlatform(Platform):
         def fetch(self, url: str) -> dict: return {}
         def parse(self, raw: dict, url: str) -> Problem: return problem
-    
+
     mocker.patch("algorepo.main.validate_url", return_value="leetcode")
     mocker.patch("algorepo.main.get_platform", return_value=MockPlatform(mock_algorepo.config))
     mocker.patch("algorepo.main.select_language", return_value=lang)
@@ -111,11 +108,11 @@ def test_algorepo_download_problem(mocker, mock_algorepo, tmp_path):
     mocker.patch("os.chdir")
 
     result = mock_algorepo.download_problem(url)
-    
+
     assert isinstance(result, DownloadResult)
     assert result.problem == problem
     assert result.language == lang
-    
+
     assert result.filepath.exists()
     assert result.filepath.name == "1. Two Sum.py"
     assert result.filepath.read_text() == "# Code here"

@@ -9,7 +9,7 @@ def test_format_result():
         language="Python3",
         filepath="~/Solutions/LeetCode/1. Two Sum.py",
     )
-    
+
     assert "Two Sum" in res
     assert "[Easy]" in res
     assert "Python3" in res
@@ -21,7 +21,7 @@ def test_format_list():
         "CodeWars": ["Even or Odd.py"],
     }
     res = format_list(solutions)
-    
+
     assert "SOLUTIONS" in res
     assert "LeetCode" in res
     assert "1. Two Sum.py" in res
