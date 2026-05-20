@@ -1,6 +1,19 @@
 [project]
 name = "algorepo"
-version = "0.1.0"
+version = "0.1.1"
+description = "CLI utility for parsing and managing algorithmic problems from platforms like LeetCode and CodeWars"
+readme = "README.md"
+authors = [{name = "algorepo authors"}]
+license = {text = "MIT"}
+keywords = ["leetcode", "codewars", "cli", "algorithms", "dsa"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+]
 requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.27",
@@ -12,6 +25,11 @@ dependencies = [
     "lxml>=6.0.2",
     "sortedcontainers>=2.4.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/elsmirroad/algorepo"
+Repository = "https://github.com/elsmirroad/algorepo"
+Issues = "https://github.com/elsmirroad/algorepo/issues"
 
 [project.optional-dependencies]
 dev = [
