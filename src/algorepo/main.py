@@ -143,6 +143,7 @@ class Algorepo:
             "C++": ["g++"],
             "Rust": ["rustc"],
             "Go": ["go"],
+            "C#": ["dotnet"],
             "JavaScript": ["node"],
             "TypeScript": ["node", "npx"],
             "Java": ["javac", "java"],

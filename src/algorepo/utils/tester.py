@@ -39,6 +39,10 @@ def parse_signature(text: str, language: str) -> FunctionSignature | None:
         "Go": r"func\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*([a-zA-Z0-9_*\[\]]+)",
         "Java": r"(?:public\s+)?([a-zA-Z0-9_<>\s\[\]]+)\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)",
         "Kotlin": r"fun\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*:\s*([a-zA-Z0-9_\[\]<>]+)",
+        "C#": (
+            r"(?:public\s+)?(?:static\s+)?([a-zA-Z0-9_<>\s\[\]]+)\s+"
+            r"([a-zA-Z0-9_]+)\s*\(([^)]*)\)"
+        ),
     }
 
     pattern = patterns.get(language)

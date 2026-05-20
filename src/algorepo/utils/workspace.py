@@ -46,6 +46,8 @@ def ensure_gitignore(solutions_dir: Path) -> bool:
         "*.exe",
         "*.o",
         "*.obj",
+        "bin/",
+        "obj/",
         "__pycache__/",
         ".pytest_cache/",
         ".venv/",

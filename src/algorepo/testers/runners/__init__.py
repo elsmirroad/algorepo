@@ -2,6 +2,7 @@ from algorepo.config import Config
 from algorepo.testers.runners.base import BaseRunner
 from algorepo.testers.runners.c import CRunner
 from algorepo.testers.runners.cpp import CPPRunner
+from algorepo.testers.runners.csharp import CSharpRunner
 from algorepo.testers.runners.go import GoRunner
 from algorepo.testers.runners.java import JavaRunner
 from algorepo.testers.runners.javascript import JavaScriptRunner
@@ -26,6 +27,8 @@ def get_runner(language_name: str, config: Config) -> BaseRunner | None:
         return RustRunner(config)
     elif language_name == "C":
         return CRunner(config)
+    elif language_name == "C#":
+        return CSharpRunner(config)
     elif language_name == "Java":
         return JavaRunner(config)
     elif language_name == "Kotlin":
